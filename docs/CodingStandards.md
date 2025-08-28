@@ -9,17 +9,11 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Use CQRS with MediatR
 - Push logic to domain models rather than services
 - Use a service layer extensively
-- App is multi-tenant intended to be SAAS
 
 ### CQRS-Specific
 - Commands should return only IDs, not full objects
 - Queries should bypass domain logic entirely
 - Event sourcing for critical student progress tracking
-
-### Multi-Tenant Specific
-- Tenant context must be resolved before authorization
-- Cross-tenant should not be possible at this time
-- Connection string per tenant pattern for data isolation
 
 ### Project Structure
 - Group related functionality together by feature
@@ -42,7 +36,6 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Caught exceptions should be logged to ILogger
 
 ## Domain-Specific Standards
-- Tenant isolation validation at repository level
 - Soft deletes by default for all student/course data
 - Immutable audit logs for all grade/enrollment changes
 

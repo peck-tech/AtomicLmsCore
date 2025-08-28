@@ -1,4 +1,3 @@
-using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,17 +5,9 @@ namespace AtomicLmsCore.Infrastructure.Persistence;
 
 public class ApplicationDbContext : DbContext
 {
-    private readonly ITenantService? _tenantService;
-
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
-    }
-
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantService tenantService)
-        : base(options)
-    {
-        _tenantService = tenantService;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,17 +28,6 @@ public class ApplicationDbContext : DbContext
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
                     break;
-            }
-        }
-
-        if (_tenantService != null)
-        {
-            foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    entry.Entity.TenantId = _tenantService.GetCurrentTenantId();
-                }
             }
         }
 

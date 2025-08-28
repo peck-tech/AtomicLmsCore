@@ -49,10 +49,6 @@ curl http://localhost:5000/api/HelloWorld
 curl "http://localhost:5000/api/HelloWorld?name=John"
 ```
 
-## Multi-Tenant Support
-
-The application supports multi-tenancy via the `X-Tenant-Id` header in API requests.
-
 ## Development Guidelines
 
 See [docs/CodingStandards.md](docs/CodingStandards.md) for detailed coding standards and conventions.

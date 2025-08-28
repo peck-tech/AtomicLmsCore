@@ -1,7 +1,5 @@
 using System.Reflection;
-using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Infrastructure.Persistence;
-using AtomicLmsCore.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -22,14 +20,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-
-builder.Services.AddScoped<ITenantService, TenantService>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
