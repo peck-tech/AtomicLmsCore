@@ -1,4 +1,4 @@
-using AtomicLmsCore.Domain.Common;
+using AtomicLmsCore.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace AtomicLmsCore.Infrastructure.Persistence;

@@ -1,4 +1,4 @@
-namespace AtomicLmsCore.Domain.Common;
+namespace AtomicLmsCore.Domain;
 
 public abstract class BaseEntity
 {
