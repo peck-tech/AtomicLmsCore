@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using AtomicLmsCore.Domain.Common;
 using AtomicLmsCore.Application.Common.Interfaces;
+using AtomicLmsCore.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace AtomicLmsCore.Infrastructure.Persistence;
 

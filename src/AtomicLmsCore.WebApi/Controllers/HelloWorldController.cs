@@ -38,14 +38,16 @@ public class HelloWorldController : ControllerBase
                 return Ok(result.Value);
             }
 
-            _logger.LogWarning("Failed to process Hello World request: {Errors}", 
+            _logger.LogWarning(
+                "Failed to process Hello World request: {Errors}",
                 string.Join(", ", result.Errors.Select(e => e.Message)));
             return BadRequest(new { errors = result.Errors.Select(e => e.Message) });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing Hello World request");
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
                 new { error = "An error occurred processing your request" });
         }
     }

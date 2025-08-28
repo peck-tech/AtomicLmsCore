@@ -5,8 +5,8 @@ namespace AtomicLmsCore.Infrastructure.Services;
 
 public class TenantService : ITenantService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private const string TenantIdHeader = "X-Tenant-Id";
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public TenantService(IHttpContextAccessor httpContextAccessor)
     {

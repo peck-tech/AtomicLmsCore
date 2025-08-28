@@ -18,15 +18,15 @@ public class GetHelloWorldQueryHandler : IRequestHandler<GetHelloWorldQuery, Res
         try
         {
             _logger.LogInformation("Processing Hello World request for {Name}", request.Name);
-            
-            var greeting = string.IsNullOrWhiteSpace(request.Name) 
-                ? "Hello World from AtomicLMS Core!" 
+
+            var greeting = string.IsNullOrWhiteSpace(request.Name)
+                ? "Hello World from AtomicLMS Core!"
                 : $"Hello {request.Name}, welcome to AtomicLMS Core!";
 
             var response = new HelloWorldDto
             {
                 Message = greeting,
-                Timestamp = DateTime.UtcNow
+                Timestamp = DateTime.UtcNow,
             };
 
             return Task.FromResult(Result.Ok(response));

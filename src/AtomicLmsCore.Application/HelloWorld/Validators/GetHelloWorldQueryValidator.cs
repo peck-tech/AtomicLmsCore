@@ -1,5 +1,5 @@
-using FluentValidation;
 using AtomicLmsCore.Application.HelloWorld.Queries;
+using FluentValidation;
 
 namespace AtomicLmsCore.Application.HelloWorld.Validators;
 

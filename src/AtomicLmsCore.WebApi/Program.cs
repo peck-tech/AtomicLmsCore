@@ -1,3 +1,4 @@
+using System.Reflection;
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Services;
@@ -6,7 +7,6 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +14,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "AtomicLMS Core API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "AtomicLMS Core API",
         Version = "v1",
-        Description = "A headless LMS API designed to be versatile and simple"
+        Description = "A headless LMS API designed to be versatile and simple",
     });
 });
 
@@ -33,7 +33,8 @@ builder.Services.AddScoped<ITenantService, TenantService>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-builder.Services.AddMediatR(cfg => {
+builder.Services.AddMediatR(cfg =>
+{
     cfg.RegisterServicesFromAssembly(typeof(AtomicLmsCore.Application.HelloWorld.Queries.GetHelloWorldQuery).Assembly);
 });
 
