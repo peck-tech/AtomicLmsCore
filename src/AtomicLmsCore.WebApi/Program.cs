@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddApplicationInsightsTelemetry();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -48,6 +50,7 @@ builder.Services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(AtomicLmsCore.Application.HelloWorld.Queries.GetHelloWorldQuery).Assembly);
+    cfg.AddOpenBehavior(typeof(AtomicLmsCore.Application.Common.Behaviors.TelemetryBehavior<,>));
 });
 
 builder.Services.AddFluentValidationAutoValidation();
