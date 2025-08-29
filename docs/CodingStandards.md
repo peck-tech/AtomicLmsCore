@@ -1,7 +1,7 @@
 # AtomicLMS Core Coding Standards
 
 ## Overview
-Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and simple.
+Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and simple. App is multi tenant intended to be SAAS.
 
 ## Code Organization
 
@@ -35,9 +35,20 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Exceptions should not be used to control code flow
 - Caught exceptions should be logged to ILogger
 
+## Identifiers
+- Use hybrid ID approach: `InternalId` (int) for database primary key, `Id` (Guid) for public API exposure
+- `InternalId` serves as the actual database primary key for performance and foreign key relationships
+- `Id` (Guid) is the only identifier exposed in public APIs → prevents enumeration, supports distributed systems
+- Never expose `InternalId` in DTOs, API responses, or public interfaces
+- Generate Guid on entity creation, ensure it's indexed for query performance
+- Use slugs/aliases only as secondary keys (for human-readable lookups or SEO) — always back them with a primary immutable ID
+- Expose a canonical ID in endpoints (/entities/{id}), and provide alternate lookup routes when needed (/entities/by-slug/{slug})
+- Prefer sequential GUIDs (UUIDv7/ULID) over random GUIDs to reduce index fragmentation when possible
+
 ## Domain-Specific Standards
 - Soft deletes by default for all student/course data
 - Immutable audit logs for all grade/enrollment changes
+- Audit Fields should be set in the Infrastructure project, and readonly in the models
 
 ## Database Conventions
 

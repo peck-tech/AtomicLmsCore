@@ -4,20 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AtomicLmsCore.Application.HelloWorld.Queries;
 
-public class GetHelloWorldQueryHandler : IRequestHandler<GetHelloWorldQuery, Result<HelloWorldDto>>
+public class GetHelloWorldQueryHandler(ILogger<GetHelloWorldQueryHandler> logger)
+    : IRequestHandler<GetHelloWorldQuery, Result<HelloWorldDto>>
 {
-    private readonly ILogger<GetHelloWorldQueryHandler> _logger;
-
-    public GetHelloWorldQueryHandler(ILogger<GetHelloWorldQueryHandler> logger)
-    {
-        _logger = logger;
-    }
-
     public Task<Result<HelloWorldDto>> Handle(GetHelloWorldQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation("Processing Hello World request for {Name}", request.Name);
+            logger.LogInformation("Processing Hello World request for {Name}", request.Name);
 
             var greeting = string.IsNullOrWhiteSpace(request.Name)
                 ? "Hello World from AtomicLMS Core!"
@@ -33,7 +27,7 @@ public class GetHelloWorldQueryHandler : IRequestHandler<GetHelloWorldQuery, Res
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing Hello World request");
+            logger.LogError(ex, "Error processing Hello World request");
             return Task.FromResult(Result.Fail<HelloWorldDto>("An error occurred processing your request"));
         }
     }

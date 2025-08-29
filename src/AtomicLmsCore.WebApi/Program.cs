@@ -1,5 +1,7 @@
 using System.Reflection;
+using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
+using AtomicLmsCore.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -19,6 +21,8 @@ builder.Services.AddSwaggerGen(c =>
         Description = "A headless LMS API designed to be versatile and simple",
     });
 });
+
+builder.Services.AddScoped<IIdGenerator, UlidIdGenerator>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
