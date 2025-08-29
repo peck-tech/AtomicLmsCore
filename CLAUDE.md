@@ -3,3 +3,4 @@
 - review and adhere to docs/CodingStandards.md before all code changes
 - code changes should check for build warnings where they violate code conventions and linting
 - code changes should run unit tests to ensure they all pass
+- the current API version is 0.1

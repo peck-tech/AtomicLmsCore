@@ -34,6 +34,7 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - API methods should catch exceptions
 - Exceptions should not be used to control code flow
 - Caught exceptions should be logged to ILogger
+- API should be versioned using ApiVersionAttribute
 
 ## Identifiers
 - Use hybrid ID approach: `InternalId` (int) for database primary key, `Id` (Guid) for public API exposure
