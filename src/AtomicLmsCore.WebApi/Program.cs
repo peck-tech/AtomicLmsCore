@@ -2,6 +2,7 @@ using System.Reflection;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Services;
+using AtomicLmsCore.WebApi.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
@@ -76,6 +77,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
