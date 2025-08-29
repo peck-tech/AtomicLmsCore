@@ -35,6 +35,7 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Exceptions should not be used to control code flow
 - Caught exceptions should be logged to ILogger
 - API should be versioned using ApiVersionAttribute
+- API methods will be put in to the feature bucket: Solution (management of tenants and other super-admin level calls), Administration (for a tenant to manage their setup), Learning (setting up courses), Learners (setting up users), and Engagement (actions by learners)
 
 ## Identifiers
 - Use hybrid ID approach: `InternalId` (int) for database primary key, `Id` (Guid) for public API exposure
@@ -94,3 +95,4 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 
 ## Security Standards
 - Follow OWASP security guidelines
+- Authentication for all controllers should be provided through Auth0
