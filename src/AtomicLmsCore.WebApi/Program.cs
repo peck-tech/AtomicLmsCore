@@ -4,7 +4,6 @@ using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 

@@ -9,6 +9,6 @@ public interface IIdGenerator
     /// Generates a new sequential GUID that can be converted from/to ULID.
     /// Sequential nature reduces database index fragmentation.
     /// </summary>
-    /// <returns>A sequential GUID suitable for public API exposure</returns>
+    /// <returns>A sequential GUID suitable for public API exposure.</returns>
     Guid NewId();
 }

@@ -18,10 +18,10 @@ public class HelloWorldController : ControllerBase
     }
 
     /// <summary>
-    /// Returns a Hello World greeting
+    /// Returns a Hello World greeting.
     /// </summary>
-    /// <param name="name">Optional name for personalized greeting</param>
-    /// <returns>HelloWorldDto with greeting message</returns>
+    /// <param name="name">Optional name for personalized greeting.</param>
+    /// <returns>HelloWorldDto with greeting message.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(HelloWorldDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
