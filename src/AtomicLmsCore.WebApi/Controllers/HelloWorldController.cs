@@ -10,8 +10,8 @@ namespace AtomicLmsCore.WebApi.Controllers;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class HelloWorldController : ControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly ILogger<HelloWorldController> _logger;
+    private readonly IMediator _mediator;
 
     public HelloWorldController(IMediator mediator, ILogger<HelloWorldController> logger)
     {
@@ -20,7 +20,7 @@ public class HelloWorldController : ControllerBase
     }
 
     /// <summary>
-    /// Returns a Hello World greeting.
+    ///     Returns a Hello World greeting.
     /// </summary>
     /// <param name="name">Optional name for personalized greeting.</param>
     /// <returns>HelloWorldDto with greeting message.</returns>

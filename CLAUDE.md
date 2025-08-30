@@ -1,5 +1,7 @@
 - AtomicLMS Core is a headless LMS, intended to be versatile and simple
 - additions to "Add to docs/CodingStandards.md" should be concise, bulleted lists with headings, deduplicating as necessary.
 - review and adhere to docs/CodingStandards.md before all code changes
+- create unit tests for all code changes in accordance docs/UnitTestPolicy.md
 - code changes should be followed by dotnet format, build, and test. Fixing any issues identified
 - the current API version is 0.1
+- do not do git commits unless explicitly told to

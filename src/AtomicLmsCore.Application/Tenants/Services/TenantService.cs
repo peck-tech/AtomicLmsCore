@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 namespace AtomicLmsCore.Application.Tenants.Services;
 
 /// <summary>
-/// Service implementation for managing tenant operations.
+///     Service implementation for managing tenant operations.
 /// </summary>
 public class TenantService(ITenantRepository tenantRepository, ILogger<TenantService> logger)
     : ITenantService
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Result<Tenant>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         try
@@ -27,7 +27,7 @@ public class TenantService(ITenantRepository tenantRepository, ILogger<TenantSer
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Result<List<Tenant>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -42,7 +42,7 @@ public class TenantService(ITenantRepository tenantRepository, ILogger<TenantSer
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Result<Guid>> CreateAsync(string name, CancellationToken cancellationToken = default)
     {
         try
@@ -68,7 +68,7 @@ public class TenantService(ITenantRepository tenantRepository, ILogger<TenantSer
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Result> UpdateAsync(Guid id, string name, CancellationToken cancellationToken = default)
     {
         try
@@ -98,7 +98,7 @@ public class TenantService(ITenantRepository tenantRepository, ILogger<TenantSer
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         try

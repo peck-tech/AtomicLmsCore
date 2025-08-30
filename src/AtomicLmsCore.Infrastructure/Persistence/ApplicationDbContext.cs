@@ -1,6 +1,7 @@
 using AtomicLmsCore.Domain;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
+using AtomicLmsCore.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace AtomicLmsCore.Infrastructure.Persistence;
@@ -13,7 +14,7 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
         // Create a default ID generator for cases where DI isn't available
-        _idGenerator = new Services.UlidIdGenerator();
+        _idGenerator = new UlidIdGenerator();
     }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IIdGenerator idGenerator)
@@ -66,6 +67,7 @@ public class ApplicationDbContext : DbContext
                     {
                         entry.Entity.Id = _idGenerator.NewId();
                     }
+
                     break;
                 case EntityState.Modified:
                     entry.Property(nameof(BaseEntity.UpdatedAt)).CurrentValue = DateTime.UtcNow;

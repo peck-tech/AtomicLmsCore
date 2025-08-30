@@ -17,11 +17,7 @@ public class GetHelloWorldQueryHandler(ILogger<GetHelloWorldQueryHandler> logger
                 ? "Hello World from AtomicLMS Core!"
                 : $"Hello {request.Name}, welcome to AtomicLMS Core!";
 
-            var response = new HelloWorldDto
-            {
-                Message = greeting,
-                Timestamp = DateTime.UtcNow,
-            };
+            var response = new HelloWorldDto { Message = greeting, Timestamp = DateTime.UtcNow };
 
             return Task.FromResult(Result.Ok(response));
         }

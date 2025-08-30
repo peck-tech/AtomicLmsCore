@@ -1,5 +1,7 @@
 using System.Reflection;
+using AtomicLmsCore.Application.Common.Behaviors;
 using AtomicLmsCore.Application.Common.Interfaces;
+using AtomicLmsCore.Application.HelloWorld.Queries;
 using AtomicLmsCore.Application.Tenants.Services;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
@@ -8,9 +10,7 @@ using AtomicLmsCore.Infrastructure.Services;
 using AtomicLmsCore.WebApi.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApiVersioning(opt =>
 {
-    opt.DefaultApiVersion = new ApiVersion(0, 1);
+    opt.DefaultApiVersion = new(0, 1);
     opt.AssumeDefaultVersionWhenUnspecified = true;
 });
 
@@ -33,12 +33,13 @@ builder.Services.AddVersionedApiExplorer(setup =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v0.1", new OpenApiInfo
-    {
-        Title = "AtomicLMS Core API",
-        Version = "v0.1",
-        Description = "A headless LMS API designed to be versatile and simple",
-    });
+    c.SwaggerDoc("v0.1",
+        new()
+        {
+            Title = "AtomicLMS Core API",
+            Version = "v0.1",
+            Description = "A headless LMS API designed to be versatile and simple"
+        });
 });
 
 builder.Services.AddScoped<IIdGenerator, UlidIdGenerator>();
@@ -54,21 +55,21 @@ builder.Services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
 
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(AtomicLmsCore.Application.HelloWorld.Queries.GetHelloWorldQuery).Assembly);
-    cfg.AddOpenBehavior(typeof(AtomicLmsCore.Application.Common.Behaviors.TelemetryBehavior<,>));
+    cfg.RegisterServicesFromAssembly(typeof(GetHelloWorldQuery).Assembly);
+    cfg.AddOpenBehavior(typeof(TelemetryBehavior<,>));
 });
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssembly(typeof(AtomicLmsCore.Application.HelloWorld.Queries.GetHelloWorldQuery).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(GetHelloWorldQuery).Assembly);
 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
