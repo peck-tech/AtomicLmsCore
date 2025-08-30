@@ -11,12 +11,37 @@ namespace AtomicLmsCore.WebApi.Common;
 /// <param name="errors">List of detailed error messages.</param>
 /// <param name="correlationId">Optional correlation identifier for request tracing.</param>
 public record ErrorResponseDto(
-    [Required] string type,
-    [Required] string title,
-    [Required] int status,
-    [Required] List<string> errors,
+    [property: Required] string type,
+    [property: Required] string title,
+    [property: Required] int status,
+    [property: Required] List<string> errors,
     string? correlationId = null)
 {
+    /// <summary>
+    /// Gets the error category (e.g., Validation, Business, System).
+    /// </summary>
+    public string Type => type;
+
+    /// <summary>
+    /// Gets the human-readable summary of the error.
+    /// </summary>
+    public string Title => title;
+
+    /// <summary>
+    /// Gets the HTTP status code.
+    /// </summary>
+    public int Status => status;
+
+    /// <summary>
+    /// Gets the list of detailed error messages.
+    /// </summary>
+    public List<string> Errors => errors;
+
+    /// <summary>
+    /// Gets the optional correlation identifier for request tracing.
+    /// </summary>
+    public string? CorrelationId => correlationId;
+
     /// <summary>
     /// Creates a validation error response.
     /// </summary>
