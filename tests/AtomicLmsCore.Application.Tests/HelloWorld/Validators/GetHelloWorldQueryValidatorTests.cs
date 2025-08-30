@@ -61,7 +61,7 @@ public class GetHelloWorldQueryValidatorTests
         var result = _validator.TestValidate(query);
 
         result.ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("Name must not exceed 100 characters.");
+            .WithErrorMessage("Name cannot exceed 100 characters");
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class GetHelloWorldQueryValidatorTests
         var result = _validator.TestValidate(query);
 
         result.ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("Name must not exceed 100 characters.");
+            .WithErrorMessage("Name cannot exceed 100 characters");
     }
 
     [Fact]

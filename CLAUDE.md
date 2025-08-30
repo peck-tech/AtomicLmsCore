@@ -2,6 +2,6 @@
 - additions to "Add to docs/CodingStandards.md" should be concise, bulleted lists with headings, deduplicating as necessary.
 - review and adhere to docs/CodingStandards.md before all code changes
 - create unit tests for all code changes in accordance docs/UnitTestPolicy.md
-- code changes should be followed by dotnet format, build, and test. Fixing any issues identified
+- Code changes workflow: After editing any code/tests, run dotnet format && dotnet build && dotnet test. The task is not complete until all three commands pass without warnings or errors.
 - the current API version is 0.1
 - do not do git commits unless explicitly told to

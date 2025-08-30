@@ -33,13 +33,13 @@ builder.Services.AddVersionedApiExplorer(setup =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v0.1",
-        new()
-        {
-            Title = "AtomicLMS Core API",
-            Version = "v0.1",
-            Description = "A headless LMS API designed to be versatile and simple"
-        });
+    var openApiInfo = new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "AtomicLMS Core API",
+        Version = "v0.1",
+        Description = "A headless LMS API designed to be versatile and simple",
+    };
+    c.SwaggerDoc("v0.1", openApiInfo);
 });
 
 builder.Services.AddScoped<IIdGenerator, UlidIdGenerator>();

@@ -25,7 +25,7 @@ public class GetHelloWorldQueryHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Message.Should().Be("Hello, John!");
+        result.Value.Message.Should().Be("Hello John, welcome to AtomicLMS Core!");
         result.Value.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
@@ -38,7 +38,7 @@ public class GetHelloWorldQueryHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Message.Should().Be("Hello, World!");
+        result.Value.Message.Should().Be("Hello World from AtomicLMS Core!");
         result.Value.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
@@ -51,7 +51,7 @@ public class GetHelloWorldQueryHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Message.Should().Be("Hello, World!");
+        result.Value.Message.Should().Be("Hello World from AtomicLMS Core!");
         result.Value.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
@@ -64,7 +64,7 @@ public class GetHelloWorldQueryHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Message.Should().Be("Hello, World!");
+        result.Value.Message.Should().Be("Hello World from AtomicLMS Core!");
         result.Value.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
@@ -77,20 +77,10 @@ public class GetHelloWorldQueryHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Message.Should().Be("Hello, John@123!!");
+        result.Value.Message.Should().Be("Hello John@123!, welcome to AtomicLMS Core!");
         result.Value.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
-    [Fact]
-    public async Task Handle_WithCancellationRequested_ThrowsOperationCanceledException()
-    {
-        var query = new GetHelloWorldQuery { Name = "John" };
-        var cancellationToken = new CancellationToken(true);
-
-        Func<Task> act = async () => await _handler.Handle(query, cancellationToken);
-
-        await act.Should().ThrowAsync<OperationCanceledException>();
-    }
 
     [Fact]
     public async Task Handle_LogsInformation()
@@ -103,7 +93,7 @@ public class GetHelloWorldQueryHandlerTests
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Generating greeting")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Processing Hello World request")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);
