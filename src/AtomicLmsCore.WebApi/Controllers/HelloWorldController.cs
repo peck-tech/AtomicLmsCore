@@ -1,4 +1,5 @@
 using AtomicLmsCore.Application.HelloWorld.Queries;
+using AtomicLmsCore.WebApi.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,8 +26,8 @@ public class HelloWorldController : ControllerBase
     /// <returns>HelloWorldDto with greeting message.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(HelloWorldDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get([FromQuery] string? name = null)
     {
         try
@@ -42,14 +43,17 @@ public class HelloWorldController : ControllerBase
             _logger.LogWarning(
                 "Failed to process Hello World request: {Errors}",
                 string.Join(", ", result.Errors.Select(e => e.Message)));
-            return BadRequest(new { errors = result.Errors.Select(e => e.Message) });
+
+            var errorResponse = ErrorResponseDto.ValidationError(
+                result.Errors.Select(e => e.Message).ToList(),
+                HttpContext.Items["CorrelationId"]?.ToString());
+            return BadRequest(errorResponse);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing Hello World request");
-            return StatusCode(
-                StatusCodes.Status500InternalServerError,
-                new { error = "An error occurred processing your request" });
+            var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
         }
     }
 }

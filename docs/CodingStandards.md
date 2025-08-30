@@ -21,11 +21,13 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 ### C# Standards
 - Support a Fluent coding style where possible by returning this instead of void
 - Mutate objects through predicates
+- Public methods on the service layer, and domain modals, should include full XML documentation
 
 ### ASP.NET Core Standards
 - Use as much config as possible, provided via IOptions pattern
 - Use Automapper to map between Entities, Domain Models, and DTOs
 - Use IHostedService for background tasks
+- All API methods should have full OpenAPI documentation
 
 ## API Design
 - The web API should be RESTful
@@ -36,6 +38,7 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Caught exceptions should be logged to ILogger
 - API should be versioned using ApiVersionAttribute
 - API methods will be put in to the feature bucket: Solution (management of tenants and other super-admin level calls), Administration (for a tenant to manage their setup), Learning (setting up courses), Learners (setting up users), and Engagement (actions by learners)
+- Use ErrorResponseDto for all error responses to ensure consistency
 
 ## Identifiers
 - Use hybrid ID approach: `InternalId` (int) for database primary key, `Id` (Guid) for public API exposure
@@ -51,6 +54,8 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Soft deletes by default for all student/course data
 - Immutable audit logs for all grade/enrollment changes
 - Audit Fields should be set in the Infrastructure project, and readonly in the models
+- All major entities should have metadata (IDictionary<string,string>)
+- Metadata should not be returned in listing actions
 
 ## Database Conventions
 
