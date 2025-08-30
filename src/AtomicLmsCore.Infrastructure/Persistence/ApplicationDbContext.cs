@@ -1,4 +1,5 @@
 using AtomicLmsCore.Domain;
+using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,8 @@ public class ApplicationDbContext : DbContext
         _idGenerator = idGenerator;
     }
 
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -28,22 +31,24 @@ public class ApplicationDbContext : DbContext
         // Configure all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (entityType.ClrType.IsSubclassOf(typeof(BaseEntity)))
+            if (!entityType.ClrType.IsSubclassOf(typeof(BaseEntity)))
             {
-                // Set InternalId as the primary key
-                modelBuilder.Entity(entityType.ClrType)
-                    .HasKey(nameof(BaseEntity.InternalId));
-
-                // Create a unique index on the public Id for performance
-                modelBuilder.Entity(entityType.ClrType)
-                    .HasIndex(nameof(BaseEntity.Id))
-                    .IsUnique();
-
-                // Configure InternalId as identity column
-                modelBuilder.Entity(entityType.ClrType)
-                    .Property(nameof(BaseEntity.InternalId))
-                    .ValueGeneratedOnAdd();
+                continue;
             }
+
+            // Set InternalId as the primary key
+            modelBuilder.Entity(entityType.ClrType)
+                .HasKey(nameof(BaseEntity.InternalId));
+
+            // Create a unique index on the public Id for performance
+            modelBuilder.Entity(entityType.ClrType)
+                .HasIndex(nameof(BaseEntity.Id))
+                .IsUnique();
+
+            // Configure InternalId as identity column
+            modelBuilder.Entity(entityType.ClrType)
+                .Property(nameof(BaseEntity.InternalId))
+                .ValueGeneratedOnAdd();
         }
     }
 
@@ -65,6 +70,11 @@ public class ApplicationDbContext : DbContext
                 case EntityState.Modified:
                     entry.Property(nameof(BaseEntity.UpdatedAt)).CurrentValue = DateTime.UtcNow;
                     break;
+                case EntityState.Detached:
+                case EntityState.Unchanged:
+                case EntityState.Deleted:
+                default:
+                    continue;
             }
         }
 

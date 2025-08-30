@@ -96,3 +96,9 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 ## Security Standards
 - Follow OWASP security guidelines
 - Authentication for all controllers should be provided through Auth0
+
+## Validation
+- Validate at the boundaries (controllers, message handlers) for request shape & permissions.
+- Enforce business rules/invariants in the domain/service layer (so all call paths are covered).
+- Repositories shouldn’t validate; they persist aggregates and rely on DB constraints as a safety net.
+- Structure validation so rules live in one place and are reused (validators, value objects, entity methods).

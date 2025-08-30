@@ -1,6 +1,9 @@
 using System.Reflection;
+using AtomicLmsCore.Application.Common.Interfaces;
+using AtomicLmsCore.Application.Tenants.Services;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
+using AtomicLmsCore.Infrastructure.Persistence.Repositories;
 using AtomicLmsCore.Infrastructure.Services;
 using AtomicLmsCore.WebApi.Middleware;
 using FluentValidation;
@@ -39,6 +42,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<IIdGenerator, UlidIdGenerator>();
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+builder.Services.AddScoped<ITenantService, TenantService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
