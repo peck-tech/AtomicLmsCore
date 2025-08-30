@@ -8,6 +8,7 @@ namespace AtomicLmsCore.Infrastructure.Services;
 /// </summary>
 public class UlidIdGenerator : IIdGenerator
 {
+    /// <inheritdoc/>
     public Guid NewId()
     {
         // Generate a new ULID and convert to Guid
