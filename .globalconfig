@@ -413,3 +413,18 @@ dotnet_diagnostic.IDE0160.severity = warning
 
 # IDE0161: Convert to file-scoped namespace
 dotnet_diagnostic.IDE0161.severity = warning
+
+# IDE0180: Use tuple to swap values
+dotnet_diagnostic.IDE0180.severity = warning
+
+# IDE0200: Remove unnecessary lambda expression
+dotnet_diagnostic.IDE0200.severity = warning
+
+# IDE0210: Convert to top-level statements
+dotnet_diagnostic.IDE0210.severity = suggestion
+
+# IDE0211: Convert to 'Program.Main' style program
+dotnet_diagnostic.IDE0211.severity = none
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = warning

@@ -2,9 +2,9 @@ using AtomicLmsCore.Domain;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Shouldly;
 
 namespace AtomicLmsCore.Infrastructure.Tests.Persistence;
 
@@ -28,29 +28,38 @@ public class ApplicationDbContextTests : IDisposable
 
     public void Dispose() => _context.Dispose();
 
+    private static Tenant CreateTestTenant(string name, string? slug = null) =>
+        new()
+        {
+            Name = name,
+            Slug = slug ?? name.ToLowerInvariant().Replace(" ", "-", StringComparison.Ordinal),
+            IsActive = true,
+            Metadata = new Dictionary<string, string>()
+        };
+
     [Fact]
     public async Task SaveChangesAsync_SetsCreatedAtAndUpdatedAt_ForNewEntities()
     {
-        var tenant = new Tenant { Name = "New Tenant" };
+        var tenant = CreateTestTenant("New Tenant");
         _context.Tenants.Add(tenant);
 
         await _context.SaveChangesAsync();
 
-        tenant.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        tenant.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        tenant.CreatedAt.Should().BeCloseTo(tenant.UpdatedAt, TimeSpan.FromMilliseconds(1));
+        tenant.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+        tenant.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+        (tenant.CreatedAt - tenant.UpdatedAt).Duration().ShouldBeLessThan(TimeSpan.FromMilliseconds(1));
     }
 
     [Fact]
     public async Task SaveChangesAsync_SetsId_ForNewEntitiesWithoutId()
     {
-        var tenant = new Tenant { Name = "New Tenant" };
-        tenant.Id.Should().Be(Guid.Empty);
+        var tenant = CreateTestTenant("New Tenant");
+        tenant.Id.ShouldBe(Guid.Empty);
 
         _context.Tenants.Add(tenant);
         await _context.SaveChangesAsync();
 
-        tenant.Id.Should().Be(_generatedId);
+        tenant.Id.ShouldBe(_generatedId);
         _idGeneratorMock.Verify(x => x.NewId(), Times.Once);
     }
 
@@ -58,19 +67,20 @@ public class ApplicationDbContextTests : IDisposable
     public async Task SaveChangesAsync_DoesNotOverrideId_ForEntitiesWithExistingId()
     {
         var existingId = Guid.NewGuid();
-        var tenant = new Tenant { Id = existingId, Name = "New Tenant" };
+        var tenant = CreateTestTenant("New Tenant");
+        tenant.Id = existingId;
 
         _context.Tenants.Add(tenant);
         await _context.SaveChangesAsync();
 
-        tenant.Id.Should().Be(existingId);
+        tenant.Id.ShouldBe(existingId);
         _idGeneratorMock.Verify(x => x.NewId(), Times.Never);
     }
 
     [Fact]
     public async Task SaveChangesAsync_UpdatesUpdatedAt_ForModifiedEntities()
     {
-        var tenant = new Tenant { Name = "Original Name" };
+        var tenant = CreateTestTenant("Original Name");
         _context.Tenants.Add(tenant);
         await _context.SaveChangesAsync();
 
@@ -81,15 +91,15 @@ public class ApplicationDbContextTests : IDisposable
         _context.Entry(tenant).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
-        tenant.UpdatedAt.Should().BeAfter(originalUpdatedAt);
-        tenant.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        tenant.CreatedAt.Should().Be(tenant.CreatedAt);
+        tenant.UpdatedAt.ShouldBeGreaterThan(originalUpdatedAt);
+        tenant.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+        tenant.CreatedAt.ShouldBe(tenant.CreatedAt);
     }
 
     [Fact]
     public async Task SaveChangesAsync_DoesNotUpdateCreatedAt_ForModifiedEntities()
     {
-        var tenant = new Tenant { Name = "Original Name" };
+        var tenant = CreateTestTenant("Original Name");
         _context.Tenants.Add(tenant);
         await _context.SaveChangesAsync();
 
@@ -99,14 +109,16 @@ public class ApplicationDbContextTests : IDisposable
         _context.Entry(tenant).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
-        tenant.CreatedAt.Should().Be(originalCreatedAt);
+        tenant.CreatedAt.ShouldBe(originalCreatedAt);
     }
 
     [Fact]
     public async Task QueryFilter_ExcludesDeletedEntities()
     {
-        var activeTenant = new Tenant { Id = Guid.NewGuid(), Name = "Active Tenant" };
-        var deletedTenant = new Tenant { Id = Guid.NewGuid(), Name = "Deleted Tenant" };
+        var activeTenant = CreateTestTenant("Active Tenant");
+        activeTenant.Id = Guid.NewGuid();
+        var deletedTenant = CreateTestTenant("Deleted Tenant");
+        deletedTenant.Id = Guid.NewGuid();
 
         // Mark as deleted using reflection since IsDeleted is private setter
         var isDeletedProperty = typeof(BaseEntity).GetProperty("IsDeleted");
@@ -117,18 +129,19 @@ public class ApplicationDbContextTests : IDisposable
 
         var tenants = await _context.Tenants.ToListAsync();
 
-        // Currently no global query filter is configured, so this will return both
-        // This test documents the current behavior - query filters would need to be added to ModelBuilder
-        tenants.Should().HaveCount(2);
-        tenants.Should().Contain(t => t.Id == activeTenant.Id);
-        tenants.Should().Contain(t => t.Id == deletedTenant.Id);
+        // Query filter should exclude deleted entities
+        tenants.Count.ShouldBe(1);
+        tenants.ShouldContain(t => t.Id == activeTenant.Id);
+        tenants.ShouldNotContain(t => t.Id == deletedTenant.Id);
     }
 
     [Fact]
     public async Task IgnoreQueryFilters_IncludesDeletedEntities()
     {
-        var activeTenant = new Tenant { Id = Guid.NewGuid(), Name = "Active Tenant" };
-        var deletedTenant = new Tenant { Id = Guid.NewGuid(), Name = "Deleted Tenant" };
+        var activeTenant = CreateTestTenant("Active Tenant");
+        activeTenant.Id = Guid.NewGuid();
+        var deletedTenant = CreateTestTenant("Deleted Tenant");
+        deletedTenant.Id = Guid.NewGuid();
 
         // Mark as deleted using reflection since IsDeleted is private setter
         var isDeletedProperty = typeof(BaseEntity).GetProperty("IsDeleted");
@@ -139,27 +152,28 @@ public class ApplicationDbContextTests : IDisposable
 
         var tenants = await _context.Tenants.IgnoreQueryFilters().ToListAsync();
 
-        tenants.Should().HaveCount(2);
-        tenants.Should().Contain(t => t.Id == activeTenant.Id);
-        tenants.Should().Contain(t => t.Id == deletedTenant.Id);
+        tenants.Count.ShouldBe(2);
+        tenants.ShouldContain(t => t.Id == activeTenant.Id);
+        tenants.ShouldContain(t => t.Id == deletedTenant.Id);
     }
 
     [Fact]
     public async Task SaveChangesAsync_HandlesMultipleEntitiesCorrectly()
     {
-        var tenant1 = new Tenant { Name = "Tenant 1" };
-        var tenant2 = new Tenant { Name = "Tenant 2" };
-        var tenant3 = new Tenant { Id = Guid.NewGuid(), Name = "Tenant 3" };
+        var tenant1 = CreateTestTenant("Tenant 1");
+        var tenant2 = CreateTestTenant("Tenant 2");
+        var tenant3 = CreateTestTenant("Tenant 3");
+        tenant3.Id = Guid.NewGuid();
 
         _context.Tenants.AddRange(tenant1, tenant2, tenant3);
         await _context.SaveChangesAsync();
 
-        tenant1.Id.Should().NotBe(Guid.Empty);
-        tenant2.Id.Should().NotBe(Guid.Empty);
-        tenant3.Id.Should().NotBe(_generatedId);
+        tenant1.Id.ShouldNotBe(Guid.Empty);
+        tenant2.Id.ShouldNotBe(Guid.Empty);
+        tenant3.Id.ShouldNotBe(_generatedId);
 
-        tenant1.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        tenant2.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        tenant3.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        tenant1.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+        tenant2.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+        tenant3.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
     }
 }

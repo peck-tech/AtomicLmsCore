@@ -59,14 +59,14 @@ public class TelemetryBehavior<TRequest, TResponse>(
                 ex,
                 new Dictionary<string, string>
                 {
-                    { "RequestType", requestName }, { "Duration", stopwatch.ElapsedMilliseconds.ToString() },
+                    { "RequestType", requestName }, { "Duration", stopwatch.ElapsedMilliseconds.ToString() }
                 });
 
             telemetryClient.TrackEvent(
                 $"{requestName}.Failed",
                 new Dictionary<string, string>
                 {
-                    { "Duration", stopwatch.ElapsedMilliseconds.ToString() }, { "ExceptionType", ex.GetType().Name },
+                    { "Duration", stopwatch.ElapsedMilliseconds.ToString() }, { "ExceptionType", ex.GetType().Name }
                 });
 
             logger.LogError(

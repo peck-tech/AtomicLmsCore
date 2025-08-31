@@ -1,7 +1,9 @@
 - AtomicLMS Core is a headless LMS, intended to be versatile and simple
+- the project is commercial software
 - additions to "Add to docs/CodingStandards.md" should be concise, bulleted lists with headings, deduplicating as necessary.
-- review and adhere to docs/CodingStandards.md before all code changes
-- create unit tests for all code changes in accordance docs/UnitTestPolicy.md
+- Code changes workflow: review and adhere to docs/CodingStandards.md before all code changes
+- Code changes workflow: after completing code changes re-review that they adhere to docs/CodingStandards.md
+- Code changes workflow: create unit tests in accordance docs/UnitTestPolicy.md
 - Code changes workflow: After editing any code/tests, run dotnet format && dotnet build && dotnet test. The task is not complete until all three commands pass without warnings or errors.
 - the current API version is 0.1
-- do not do git commits unless explicitly told to
+- do not do any git commits unless explicitly told to

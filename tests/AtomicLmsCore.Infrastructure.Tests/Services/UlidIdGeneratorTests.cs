@@ -1,5 +1,5 @@
 using AtomicLmsCore.Infrastructure.Services;
-using FluentAssertions;
+using Shouldly;
 
 namespace AtomicLmsCore.Infrastructure.Tests.Services;
 
@@ -17,8 +17,8 @@ public class UlidIdGeneratorTests
     {
         var id = _generator.NewId();
 
-        id.Should().NotBeEmpty();
-        id.Should().NotBe(Guid.Empty);
+        id.ShouldNotBe(Guid.Empty);
+        id.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class UlidIdGeneratorTests
             ids.Add(id);
         }
 
-        ids.Count.Should().Be(Count, "all generated IDs should be unique");
+        ids.Count.ShouldBe(Count, "all generated IDs should be unique");
     }
 
     [Fact]
@@ -53,8 +53,8 @@ public class UlidIdGeneratorTests
 
         // ULIDs contain timestamp information, so newer ones should generally be "larger"
         // when considering their timestamp portion, but GUID ordering may not reflect this
-        ids.Should().HaveCount(Count, "all IDs should be generated");
-        ids.Should().OnlyHaveUniqueItems("all IDs should be unique");
+        ids.Count.ShouldBe(Count, "all IDs should be generated");
+        ids.Distinct().Count().ShouldBe(Count, "all IDs should be unique");
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class UlidIdGeneratorTests
             ids.Add(id);
         }
 
-        ids.Count.Should().Be(tasks.Length, "all IDs generated in parallel should be unique");
+        ids.Count.ShouldBe(tasks.Length, "all IDs generated in parallel should be unique");
     }
 
     [Fact]
@@ -89,9 +89,9 @@ public class UlidIdGeneratorTests
 
         var orderedIds = new[] { id1, id2, id3 }.OrderBy(x => x).ToArray();
 
-        orderedIds[0].Should().Be(id1, "first generated ID should be smallest");
-        orderedIds[1].Should().Be(id2, "second generated ID should be middle");
-        orderedIds[2].Should().Be(id3, "third generated ID should be largest");
+        orderedIds[0].ShouldBe(id1, "first generated ID should be smallest");
+        orderedIds[1].ShouldBe(id2, "second generated ID should be middle");
+        orderedIds[2].ShouldBe(id3, "third generated ID should be largest");
     }
 
     [Fact]
@@ -100,13 +100,13 @@ public class UlidIdGeneratorTests
         var id = _generator.NewId();
         var bytes = id.ToByteArray();
 
-        bytes.Length.Should().Be(16, "GUID should be 16 bytes");
+        bytes.Length.ShouldBe(16, "GUID should be 16 bytes");
 
         var convertBack = () =>
         {
             var _ = new Guid(bytes);
         };
 
-        convertBack.Should().NotThrow("should be able to reconstruct GUID from bytes");
+        Should.NotThrow(() => convertBack(), "should be able to reconstruct GUID from bytes");
     }
 }

@@ -38,6 +38,8 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Caught exceptions should be logged to ILogger
 - API should be versioned using ApiVersionAttribute
 - API methods will be put in to the feature bucket: Solution (management of tenants and other super-admin level calls), Administration (for a tenant to manage their setup), Learning (setting up courses), Learners (setting up users), and Engagement (actions by learners)
+- Feature buckets should be represented in the API path structure: `api/v{version}/solution/...`, `api/v{version}/administration/...`, `api/v{version}/learning/...`, `api/v{version}/learners/...`, `api/v{version}/engagement/...`
+- API calls in all feature buckets other than Solution must include a tenant ID provided as a header, otherwise a bad request should be returned
 - Use ErrorResponseDto for all error responses to ensure consistency
 
 ## Identifiers

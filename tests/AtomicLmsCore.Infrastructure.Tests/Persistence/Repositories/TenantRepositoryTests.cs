@@ -3,10 +3,10 @@ using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Persistence.Repositories;
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Shouldly;
 
 namespace AtomicLmsCore.Infrastructure.Tests.Persistence.Repositories;
 
@@ -33,20 +33,33 @@ public class TenantRepositoryTests : IDisposable
 
     public void Dispose() => _context.Dispose();
 
+    protected static Tenant CreateTestTenant(string name, string? slug = null, int? internalId = null) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            Slug = slug ?? name.ToLowerInvariant().Replace(" ", "-", StringComparison.Ordinal),
+            IsActive = true,
+            Metadata = new Dictionary<string, string>(),
+            InternalId = internalId ?? 0
+        };
+
     public class GetByIdAsyncTests : TenantRepositoryTests
     {
         [Fact]
         public async Task GetByIdAsync_WhenTenantExists_ReturnsTenant()
         {
-            var tenant = new Tenant { Id = Guid.NewGuid(), Name = "Test Tenant", InternalId = 1 };
+            var tenant = CreateTestTenant("Test Tenant", "test-tenant", 1);
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
 
             var result = await _repository.GetByIdAsync(tenant.Id);
 
-            result.Should().NotBeNull();
-            result.Id.Should().Be(tenant.Id);
-            result.Name.Should().Be(tenant.Name);
+            result.ShouldNotBeNull();
+            result.Id.ShouldBe(tenant.Id);
+            result.Name.ShouldBe(tenant.Name);
+            result.Slug.ShouldBe(tenant.Slug);
+            result.IsActive.ShouldBe(tenant.IsActive);
         }
 
         [Fact]
@@ -56,13 +69,13 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetByIdAsync(nonExistentId);
 
-            result.Should().BeNull();
+            result.ShouldBeNull();
         }
 
         [Fact]
         public async Task GetByIdAsync_WhenTenantIsDeleted_ReturnsNull()
         {
-            var tenant = new Tenant { Id = Guid.NewGuid(), Name = "Deleted Tenant", InternalId = 1 };
+            var tenant = CreateTestTenant("Deleted Tenant", "deleted-tenant", 1);
 
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
@@ -74,7 +87,7 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetByIdAsync(tenant.Id);
 
-            result.Should().BeNull();
+            result.ShouldBeNull();
         }
     }
 
@@ -83,9 +96,9 @@ public class TenantRepositoryTests : IDisposable
         [Fact]
         public async Task GetAllAsync_ReturnsOnlyNonDeletedTenants()
         {
-            var tenant1 = new Tenant { Id = Guid.NewGuid(), Name = "Tenant 1", InternalId = 1 };
-            var tenant2 = new Tenant { Id = Guid.NewGuid(), Name = "Tenant 2", InternalId = 2 };
-            var deletedTenant = new Tenant { Id = Guid.NewGuid(), Name = "Deleted Tenant", InternalId = 3 };
+            var tenant1 = CreateTestTenant("Tenant 1", "tenant-1", 1);
+            var tenant2 = CreateTestTenant("Tenant 2", "tenant-2", 2);
+            var deletedTenant = CreateTestTenant("Deleted Tenant", "deleted-tenant", 3);
 
             _context.Tenants.AddRange(tenant1, tenant2, deletedTenant);
             await _context.SaveChangesAsync();
@@ -97,10 +110,10 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetAllAsync();
 
-            result.Should().HaveCount(2);
-            result.Should().Contain(t => t.Id == tenant1.Id);
-            result.Should().Contain(t => t.Id == tenant2.Id);
-            result.Should().NotContain(t => t.Id == deletedTenant.Id);
+            result.Count.ShouldBe(2);
+            result.ShouldContain(t => t.Id == tenant1.Id);
+            result.ShouldContain(t => t.Id == tenant2.Id);
+            result.ShouldNotContain(t => t.Id == deletedTenant.Id);
         }
 
         [Fact]
@@ -108,8 +121,8 @@ public class TenantRepositoryTests : IDisposable
         {
             var result = await _repository.GetAllAsync();
 
-            result.Should().NotBeNull();
-            result.Should().BeEmpty();
+            result.ShouldNotBeNull();
+            result.ShouldBeEmpty();
         }
     }
 
@@ -118,28 +131,28 @@ public class TenantRepositoryTests : IDisposable
         [Fact]
         public async Task AddAsync_CreatesTenant()
         {
-            var tenant = new Tenant { Name = "New Tenant" };
+            var tenant = CreateTestTenant("New Tenant");
 
             var result = await _repository.AddAsync(tenant);
 
-            result.Should().NotBeNull();
-            result.Id.Should().NotBeEmpty();
-            result.Name.Should().Be("New Tenant");
-            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-            result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+            result.ShouldNotBeNull();
+            result.Id.ShouldNotBe(Guid.Empty);
+            result.Name.ShouldBe("New Tenant");
+            result.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+            result.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
 
             var savedTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == result.Id);
-            savedTenant.Should().NotBeNull();
+            savedTenant.ShouldNotBeNull();
         }
 
         [Fact]
         public async Task AddAsync_AssignsInternalId()
         {
-            var tenant = new Tenant { Name = "New Tenant" };
+            var tenant = CreateTestTenant("New Tenant");
 
             var result = await _repository.AddAsync(tenant);
 
-            result.InternalId.Should().BeGreaterThan(0);
+            result.InternalId.ShouldBeGreaterThan(0);
         }
     }
 
@@ -148,7 +161,7 @@ public class TenantRepositoryTests : IDisposable
         [Fact]
         public async Task UpdateAsync_WhenTenantExists_UpdatesTenant()
         {
-            var tenant = new Tenant { Id = Guid.NewGuid(), Name = "Original Name", InternalId = 1 };
+            var tenant = CreateTestTenant("Original Name", "original-name", 1);
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
 
@@ -156,8 +169,8 @@ public class TenantRepositoryTests : IDisposable
             await _repository.UpdateAsync(tenant);
 
             var updatedTenant = await _context.Tenants.FirstAsync(t => t.Id == tenant.Id);
-            updatedTenant.Name.Should().Be("Updated Name");
-            updatedTenant.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+            updatedTenant.Name.ShouldBe("Updated Name");
+            updatedTenant.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
         }
     }
 
@@ -166,20 +179,20 @@ public class TenantRepositoryTests : IDisposable
         [Fact]
         public async Task DeleteAsync_WhenTenantExists_PerformsSoftDelete()
         {
-            var tenant = new Tenant { Id = Guid.NewGuid(), Name = "To Delete", InternalId = 1 };
+            var tenant = CreateTestTenant("To Delete", "to-delete", 1);
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
 
             var result = await _repository.DeleteAsync(tenant.Id);
 
-            result.Should().BeTrue();
+            result.ShouldBeTrue();
 
             var deletedTenant = await _context.Tenants
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == tenant.Id);
 
-            deletedTenant.Should().NotBeNull();
-            deletedTenant.IsDeleted.Should().BeTrue();
+            deletedTenant.ShouldNotBeNull();
+            deletedTenant.IsDeleted.ShouldBeTrue();
         }
 
         [Fact]
@@ -189,13 +202,13 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.DeleteAsync(nonExistentId);
 
-            result.Should().BeFalse();
+            result.ShouldBeFalse();
         }
 
         [Fact]
         public async Task DeleteAsync_WhenTenantAlreadyDeleted_ReturnsFalse()
         {
-            var tenant = new Tenant { Id = Guid.NewGuid(), Name = "Already Deleted", InternalId = 1 };
+            var tenant = CreateTestTenant("Already Deleted", "already-deleted", 1);
 
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
@@ -206,7 +219,7 @@ public class TenantRepositoryTests : IDisposable
             // Try to delete again
             var result = await _repository.DeleteAsync(tenant.Id);
 
-            result.Should().BeFalse();
+            result.ShouldBeFalse();
         }
     }
 }

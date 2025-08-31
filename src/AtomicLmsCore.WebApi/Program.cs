@@ -1,16 +1,17 @@
-using System.Reflection;
 using AtomicLmsCore.Application.Common.Behaviors;
 using AtomicLmsCore.Application.Common.Interfaces;
-using AtomicLmsCore.Application.HelloWorld.Queries;
+using AtomicLmsCore.Application.Tenants.Queries;
 using AtomicLmsCore.Application.Tenants.Services;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Persistence.Repositories;
 using AtomicLmsCore.Infrastructure.Services;
+using AtomicLmsCore.WebApi.Mappings;
 using AtomicLmsCore.WebApi.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +34,7 @@ builder.Services.AddVersionedApiExplorer(setup =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    var openApiInfo = new Microsoft.OpenApi.Models.OpenApiInfo
+    var openApiInfo = new OpenApiInfo
     {
         Title = "AtomicLMS Core API",
         Version = "v0.1",
@@ -51,17 +52,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
-builder.Services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<TenantMappingProfile>());
 
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(GetHelloWorldQuery).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(GetTenantByIdQuery).Assembly);
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
     cfg.AddOpenBehavior(typeof(TelemetryBehavior<,>));
 });
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssembly(typeof(GetHelloWorldQuery).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(GetTenantByIdQuery).Assembly);
 
 builder.Services.AddCors(options =>
 {

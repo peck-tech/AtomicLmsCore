@@ -1,6 +1,7 @@
 using AtomicLmsCore.Domain;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
+using AtomicLmsCore.Infrastructure.Persistence.Configurations;
 using AtomicLmsCore.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,9 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Apply entity configurations
+        modelBuilder.ApplyConfiguration(new TenantConfiguration());
 
         // Configure all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

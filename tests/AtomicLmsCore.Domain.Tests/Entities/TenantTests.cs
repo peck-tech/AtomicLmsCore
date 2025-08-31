@@ -1,5 +1,5 @@
 using AtomicLmsCore.Domain.Entities;
-using FluentAssertions;
+using Shouldly;
 
 namespace AtomicLmsCore.Domain.Tests.Entities;
 
@@ -10,7 +10,7 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Should().BeAssignableTo<BaseEntity>();
+        tenant.ShouldBeAssignableTo<BaseEntity>();
     }
 
     [Fact]
@@ -18,18 +18,66 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Name.Should().Be(string.Empty);
+        tenant.Name.ShouldBe(string.Empty);
     }
 
     [Fact]
     public void Tenant_Name_Can_Be_Set()
     {
-        var tenant = new Tenant
-        {
-            Name = "Test Tenant"
-        };
+        var tenant = new Tenant { Name = "Test Tenant" };
 
-        tenant.Name.Should().Be("Test Tenant");
+        tenant.Name.ShouldBe("Test Tenant");
+    }
+
+    [Fact]
+    public void Tenant_Slug_Defaults_To_Empty_String()
+    {
+        var tenant = new Tenant();
+
+        tenant.Slug.ShouldBe(string.Empty);
+    }
+
+    [Fact]
+    public void Tenant_Slug_Can_Be_Set()
+    {
+        var tenant = new Tenant { Slug = "test-tenant" };
+
+        tenant.Slug.ShouldBe("test-tenant");
+    }
+
+    [Fact]
+    public void Tenant_IsActive_Defaults_To_True()
+    {
+        var tenant = new Tenant();
+
+        tenant.IsActive.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Tenant_IsActive_Can_Be_Set()
+    {
+        var tenant = new Tenant { IsActive = false };
+
+        tenant.IsActive.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Tenant_Metadata_Defaults_To_Empty_Dictionary()
+    {
+        var tenant = new Tenant();
+
+        tenant.Metadata.ShouldNotBeNull();
+        tenant.Metadata.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Tenant_Metadata_Can_Be_Set()
+    {
+        var metadata = new Dictionary<string, string> { { "key1", "value1" }, { "key2", "value2" } };
+
+        var tenant = new Tenant { Metadata = metadata };
+
+        tenant.Metadata.ShouldBeEquivalentTo(metadata);
     }
 
     [Fact]
@@ -37,12 +85,12 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Id.Should().BeEmpty();
-        tenant.InternalId.Should().Be(0);
-        tenant.CreatedAt.Should().Be(default);
-        tenant.UpdatedAt.Should().Be(default);
-        tenant.CreatedBy.Should().Be(string.Empty);
-        tenant.UpdatedBy.Should().Be(string.Empty);
-        tenant.IsDeleted.Should().BeFalse();
+        tenant.Id.ShouldBe(Guid.Empty);
+        tenant.InternalId.ShouldBe(0);
+        tenant.CreatedAt.ShouldBe(default);
+        tenant.UpdatedAt.ShouldBe(default);
+        tenant.CreatedBy.ShouldBe(string.Empty);
+        tenant.UpdatedBy.ShouldBe(string.Empty);
+        tenant.IsDeleted.ShouldBeFalse();
     }
 }
