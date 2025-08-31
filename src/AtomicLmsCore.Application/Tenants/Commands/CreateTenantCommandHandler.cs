@@ -28,7 +28,7 @@ public class CreateTenantCommandHandler(ITenantRepository tenantRepository, IIdG
                 Name = request.Name,
                 Slug = request.Slug,
                 IsActive = request.IsActive,
-                Metadata = request.Metadata ?? new Dictionary<string, string>()
+                Metadata = request.Metadata ?? new Dictionary<string, string>(),
             };
 
             await tenantRepository.AddAsync(tenant, cancellationToken);
