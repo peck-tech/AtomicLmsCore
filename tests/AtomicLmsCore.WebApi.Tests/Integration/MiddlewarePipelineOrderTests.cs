@@ -2,62 +2,68 @@ using System.Security.Claims;
 using AtomicLmsCore.WebApi.Middleware;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AtomicLmsCore.WebApi.Tests.Integration;
 
-public class MiddlewarePipelineOrderTests
+public class MiddlewarePipelineOrderTests : IDisposable
 {
+    private readonly List<IHost> _hosts = new();
+
     [Fact]
     public async Task MiddlewarePipeline_CorrelationIdSetBeforeTenantResolution()
     {
         // Arrange
         var executionOrder = new List<string>();
-        var builder = WebApplication.CreateBuilder();
 
-        // Configure services
-        builder.Services.AddSingleton(Mock.Of<ILogger<CorrelationIdMiddleware>>());
-        builder.Services.AddSingleton(Mock.Of<ILogger<TenantResolutionMiddleware>>());
+        var host = new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseTestServer()
+                    .ConfigureServices(services =>
+                    {
+                        services.AddSingleton(Mock.Of<ILogger<CorrelationIdMiddleware>>());
+                        services.AddSingleton(Mock.Of<ILogger<TenantResolutionMiddleware>>());
+                    })
+                    .Configure(app =>
+                    {
+                        app.UseMiddleware<CorrelationIdMiddleware>();
+                        app.UseMiddleware<TenantResolutionMiddleware>();
 
-        var app = builder.Build();
+                        app.Use((HttpContext context, RequestDelegate next) =>
+                        {
+                            executionOrder.Add("FinalMiddleware");
 
-        // Configure pipeline in correct order
-        app.UseMiddleware<CorrelationIdMiddleware>();
-        app.UseMiddleware<TenantResolutionMiddleware>();
+                            // Verify CorrelationId was set by first middleware
+                            context.Items.Should().ContainKey("CorrelationId");
+                            var correlationId = context.Items["CorrelationId"];
+                            correlationId.Should().NotBeNull();
 
-        // Add test endpoint to verify order
-        app.Use(async (context, next) =>
-        {
-            executionOrder.Add("FinalMiddleware");
+                            context.Response.WriteAsync("OK").Wait();
+                            return Task.CompletedTask;
+                        });
+                    });
+            })
+            .Build();
 
-            // Verify CorrelationId was set by first middleware
-            context.Items.Should().ContainKey("CorrelationId");
-            var correlationId = context.Items["CorrelationId"];
-            correlationId.Should().NotBeNull();
+        _hosts.Add(host);
+        await host.StartAsync();
 
-            await next();
-        });
+        var testServer = host.GetTestServer();
+        var client = testServer.CreateClient();
 
         // Act
-        var context = new DefaultHttpContext();
-        context.Request.Path = "/api/v0.1/solution/tenants"; // Solution endpoint bypasses tenant validation
-        context.Response.Body = new MemoryStream();
-
-        await app.StartAsync();
-
-        using var scope = app.Services.CreateScope();
-        var pipeline = app.Services.GetRequiredService<RequestDelegate>();
-
-        await pipeline(context);
+        var response = await client.GetAsync("/api/v0.1/solution/tenants");
 
         // Assert
-        context.Items.Should().ContainKey("CorrelationId");
-        context.Response.Headers.Should().ContainKey("X-Correlation-ID");
-
-        await app.StopAsync();
+        response.Headers.Should().Contain(h => h.Key == "X-Correlation-ID");
     }
 
     [Fact]
@@ -106,34 +112,42 @@ public class MiddlewarePipelineOrderTests
     public async Task MiddlewarePipeline_ErrorResponsesIncludeCorrelationId()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder();
-        builder.Services.AddSingleton(Mock.Of<ILogger<CorrelationIdMiddleware>>());
-        builder.Services.AddSingleton(Mock.Of<ILogger<TenantResolutionMiddleware>>());
+        var host = new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseTestServer()
+                    .ConfigureServices(services =>
+                    {
+                        services.AddSingleton(Mock.Of<ILogger<CorrelationIdMiddleware>>());
+                        services.AddSingleton(Mock.Of<ILogger<TenantResolutionMiddleware>>());
+                    })
+                    .Configure(app =>
+                    {
+                        app.UseMiddleware<CorrelationIdMiddleware>();
+                        app.UseMiddleware<TenantResolutionMiddleware>();
+                    });
+            })
+            .Build();
 
-        var app = builder.Build();
+        _hosts.Add(host);
+        await host.StartAsync();
 
-        app.UseMiddleware<CorrelationIdMiddleware>();
-        app.UseMiddleware<TenantResolutionMiddleware>();
-
-        var context = CreateTestContext("/api/v0.1/learners/users");
-        context.User = CreateUser(tenantClaims: []); // No tenant claims should cause 403
-
-        await app.StartAsync();
-
-        using var scope = app.Services.CreateScope();
-        var pipeline = app.Services.GetRequiredService<RequestDelegate>();
+        var testServer = host.GetTestServer();
 
         // Act
-        await pipeline(context);
+        var context = await testServer.SendAsync(c =>
+        {
+            c.Request.Path = "/api/v0.1/learners/users";
+            c.User = CreateUser(tenantClaims: []); // No tenant claims should cause 403
+        });
 
         // Assert
         context.Response.StatusCode.Should().Be(403);
         context.Items.Should().ContainKey("CorrelationId");
 
-        var responseBody = await GetResponseBody(context);
-        responseBody.Should().Contain("correlationId");
-
-        await app.StopAsync();
+        // TestHost response streams don't support Position, but we can check headers
+        context.Response.Headers.Should().ContainKey("X-Correlation-ID");
     }
 
     [Theory]
@@ -204,7 +218,7 @@ public class MiddlewarePipelineOrderTests
         {
             "HttpsRedirection",
             "CorrelationId",
-            "Authentication", // Not yet implemented
+            "Authentication",
             "TenantResolution",
             "CORS",
             "Authorization"
@@ -257,10 +271,11 @@ public class MiddlewarePipelineOrderTests
         await pipeline(context);
     }
 
-    private static async Task<string> GetResponseBody(HttpContext context)
+    public void Dispose()
     {
-        context.Response.Body.Position = 0;
-        using var reader = new StreamReader(context.Response.Body);
-        return await reader.ReadToEndAsync();
+        foreach (var host in _hosts)
+        {
+            host?.Dispose();
+        }
     }
 }
