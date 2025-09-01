@@ -61,4 +61,15 @@ public record ErrorResponseDto(
             400,
             [message],
             correlationId);
+
+    /// <summary>
+    ///     Creates a forbidden error response.
+    /// </summary>
+    public static ErrorResponseDto ForbiddenError(string message, string? correlationId = null)
+        => new(
+            "Forbidden",
+            "Access denied.",
+            403,
+            [message],
+            correlationId);
 }

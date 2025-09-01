@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace AtomicLmsCore.Infrastructure.Services;
 
 /// <summary>
-/// SQL Server implementation of database operations for tenant database management.
+///     SQL Server implementation of database operations for tenant database management.
 /// </summary>
 public class SqlServerDatabaseOperations(ILogger<SqlServerDatabaseOperations> logger) : IDatabaseOperations
 {

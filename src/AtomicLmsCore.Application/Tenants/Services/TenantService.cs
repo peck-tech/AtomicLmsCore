@@ -52,7 +52,10 @@ public class TenantService(ITenantRepository tenantRepository, ILogger<TenantSer
                 return Result.Fail<Guid>("Tenant name is required");
             }
 
-            var tenant = new Tenant { Name = name };
+            var tenant = new Tenant
+            {
+                Name = name,
+            };
             var createdTenant = await tenantRepository.AddAsync(tenant, cancellationToken);
 
             logger.LogInformation(

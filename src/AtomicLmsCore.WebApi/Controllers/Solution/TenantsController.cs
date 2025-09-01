@@ -15,7 +15,7 @@ namespace AtomicLmsCore.WebApi.Controllers.Solution;
 /// </summary>
 [ApiController]
 [ApiVersion("0.1")]
-[Route("api/v{version:apiVersion}/solution/[controller]")]
+[Route(FeatureBucketPaths.SolutionRoute)]
 [Authorize(Roles = "superadmin")]
 public class TenantsController(IMediator mediator, ILogger<TenantsController> logger, IMapper mapper) : ControllerBase
 {
@@ -123,7 +123,13 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
 
             if (result.IsSuccess)
             {
-                return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new
+                    {
+                        id = result.Value,
+                    },
+                    result.Value);
             }
 
             logger.LogWarning(

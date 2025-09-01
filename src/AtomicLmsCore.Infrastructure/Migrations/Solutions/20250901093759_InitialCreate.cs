@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore.Migrations;
-
 #nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AtomicLmsCore.Infrastructure.Migrations.Solutions;
 
@@ -11,21 +11,21 @@ public partial class InitialCreate : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
-            name: "Tenant",
-            columns: table => new
+            "Tenant",
+            table => new
             {
-                InternalId = table.Column<int>(type: "int", nullable: false)
+                InternalId = table.Column<int>("int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                Slug = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                Metadata = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                Name = table.Column<string>("nvarchar(255)", maxLength: 255, nullable: false),
+                Slug = table.Column<string>("nvarchar(100)", maxLength: 100, nullable: false),
+                IsActive = table.Column<bool>("bit", nullable: false, defaultValue: true),
+                Metadata = table.Column<string>("nvarchar(max)", nullable: false),
+                Id = table.Column<Guid>("uniqueidentifier", nullable: false),
+                CreatedAt = table.Column<DateTime>("datetime2", nullable: false),
+                UpdatedAt = table.Column<DateTime>("datetime2", nullable: false),
+                CreatedBy = table.Column<string>("nvarchar(max)", nullable: false),
+                UpdatedBy = table.Column<string>("nvarchar(max)", nullable: false),
+                IsDeleted = table.Column<bool>("bit", nullable: false),
             },
             constraints: table =>
             {
@@ -33,22 +33,19 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateIndex(
-            name: "IX_Tenant_Id",
-            table: "Tenant",
-            column: "Id",
+            "IX_Tenant_Id",
+            "Tenant",
+            "Id",
             unique: true);
 
         migrationBuilder.CreateIndex(
-            name: "IX_Tenant_Slug",
-            table: "Tenant",
-            column: "Slug",
+            "IX_Tenant_Slug",
+            "Tenant",
+            "Slug",
             unique: true);
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
-    {
-        migrationBuilder.DropTable(
-            name: "Tenant");
-    }
+        => migrationBuilder.DropTable(name: "Tenant");
 }

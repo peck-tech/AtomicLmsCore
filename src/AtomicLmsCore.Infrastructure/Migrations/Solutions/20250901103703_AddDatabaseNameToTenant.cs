@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore.Migrations;
-
 #nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AtomicLmsCore.Infrastructure.Migrations.Solutions;
 
@@ -11,17 +11,17 @@ public partial class AddDatabaseNameToTenant : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.AddColumn<string>(
-            name: "DatabaseName",
-            table: "Tenant",
-            type: "nvarchar(255)",
+            "DatabaseName",
+            "Tenant",
+            "nvarchar(255)",
             maxLength: 255,
             nullable: false,
             defaultValue: string.Empty);
 
         migrationBuilder.CreateIndex(
-            name: "IX_Tenant_DatabaseName",
-            table: "Tenant",
-            column: "DatabaseName",
+            "IX_Tenant_DatabaseName",
+            "Tenant",
+            "DatabaseName",
             unique: true);
     }
 
@@ -29,11 +29,11 @@ public partial class AddDatabaseNameToTenant : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropIndex(
-            name: "IX_Tenant_DatabaseName",
-            table: "Tenant");
+            "IX_Tenant_DatabaseName",
+            "Tenant");
 
         migrationBuilder.DropColumn(
-            name: "DatabaseName",
-            table: "Tenant");
+            "DatabaseName",
+            "Tenant");
     }
 }

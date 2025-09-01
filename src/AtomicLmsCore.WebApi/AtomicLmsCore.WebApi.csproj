@@ -7,28 +7,29 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageReference Include="MediatR" Version="13.0.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
+    <PackageReference Include="AutoMapper" Version="15.0.1"/>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1"/>
+    <PackageReference Include="MediatR" Version="13.0.0"/>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.8"/>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AtomicLmsCore.Application\AtomicLmsCore.Application.csproj" />
-    <ProjectReference Include="..\AtomicLmsCore.Infrastructure\AtomicLmsCore.Infrastructure.csproj" />
+    <ProjectReference Include="..\AtomicLmsCore.Application\AtomicLmsCore.Application.csproj"/>
+    <ProjectReference Include="..\AtomicLmsCore.Infrastructure\AtomicLmsCore.Infrastructure.csproj"/>
   </ItemGroup>
 
 </Project>

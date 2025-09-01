@@ -23,8 +23,12 @@ public class TelemetryBehavior<TRequest, TResponse>(
             $"{requestName}.Started",
             new Dictionary<string, string>
             {
-                { "RequestType", typeof(TRequest).FullName ?? requestName },
-                { "ResponseType", typeof(TResponse).FullName ?? typeof(TResponse).Name },
+                {
+                    "RequestType", typeof(TRequest).FullName ?? requestName
+                },
+                {
+                    "ResponseType", typeof(TResponse).FullName ?? typeof(TResponse).Name
+                },
             });
 
         logger.LogInformation("Processing {RequestName}", requestName);
@@ -39,7 +43,12 @@ public class TelemetryBehavior<TRequest, TResponse>(
                 $"{requestName}.Completed",
                 new Dictionary<string, string>
                 {
-                    { "Success", "true" }, { "Duration", stopwatch.ElapsedMilliseconds.ToString() },
+                    {
+                        "Success", "true"
+                    },
+                    {
+                        "Duration", stopwatch.ElapsedMilliseconds.ToString()
+                    },
                 });
 
             telemetryClient.TrackMetric($"{requestName}.Duration", stopwatch.ElapsedMilliseconds);
@@ -59,14 +68,24 @@ public class TelemetryBehavior<TRequest, TResponse>(
                 ex,
                 new Dictionary<string, string>
                 {
-                    { "RequestType", requestName }, { "Duration", stopwatch.ElapsedMilliseconds.ToString() },
+                    {
+                        "RequestType", requestName
+                    },
+                    {
+                        "Duration", stopwatch.ElapsedMilliseconds.ToString()
+                    },
                 });
 
             telemetryClient.TrackEvent(
                 $"{requestName}.Failed",
                 new Dictionary<string, string>
                 {
-                    { "Duration", stopwatch.ElapsedMilliseconds.ToString() }, { "ExceptionType", ex.GetType().Name },
+                    {
+                        "Duration", stopwatch.ElapsedMilliseconds.ToString()
+                    },
+                    {
+                        "ExceptionType", ex.GetType().Name
+                    },
                 });
 
             logger.LogError(

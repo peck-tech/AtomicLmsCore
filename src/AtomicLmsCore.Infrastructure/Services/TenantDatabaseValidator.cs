@@ -24,9 +24,6 @@ public class TenantDatabaseValidator(
     private const string CacheKeyPrefix = "tenant_db_validation_";
     private static readonly TimeSpan ValidationCacheExpiry = TimeSpan.FromHours(1);
 
-    private static string GetCacheKey(Guid tenantId, string databaseName) =>
-        $"{CacheKeyPrefix}{tenantId}_{databaseName}";
-
     /// <inheritdoc />
     public async Task<Result> ValidateTenantDatabaseAsync(Guid tenantId, string databaseName)
     {
@@ -157,11 +154,12 @@ public class TenantDatabaseValidator(
 
     /// <inheritdoc />
     public void ClearAllValidationCaches()
-    {
         // Note: MemoryCache doesn't provide a built-in way to clear by prefix
         // This would be better implemented with Redis or a custom cache wrapper
-        logger.LogInformation("Request to clear all validation caches (not fully implemented with MemoryCache)");
-    }
+        => logger.LogInformation("Request to clear all validation caches (not fully implemented with MemoryCache)");
+
+    private static string GetCacheKey(Guid tenantId, string databaseName) =>
+        $"{CacheKeyPrefix}{tenantId}_{databaseName}";
 
     private async Task<Result> PerformValidationAsync(Guid tenantId, string databaseName)
     {

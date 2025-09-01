@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AtomicLmsCore.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -45,14 +46,14 @@ public class UserTenantConfiguration : IEntityTypeConfiguration<User>
         // Configure metadata as JSON
         builder.Property(u => u.Metadata)
             .HasConversion(
-                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
-                v => System.Text.Json.JsonSerializer.Deserialize<IDictionary<string, string>>(
-                    v, (System.Text.Json.JsonSerializerOptions?)null) ?? new Dictionary<string, string>())
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<IDictionary<string, string>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, string>())
             .HasColumnType("nvarchar(max)")
-            .Metadata.SetValueComparer(new ValueComparer<IDictionary<string, string>>(
-                (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => new Dictionary<string, string>(c)));
+            .Metadata.SetValueComparer(
+                new ValueComparer<IDictionary<string, string>>(
+                    (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => new Dictionary<string, string>(c)));
 
         // Indexes for performance - no need for tenant filtering
         builder.HasIndex(u => u.Email)

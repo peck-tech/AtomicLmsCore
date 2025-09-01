@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore.Migrations;
-
 #nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AtomicLmsCore.Infrastructure.Migrations.Tenant;
 
@@ -11,12 +11,12 @@ public partial class RenameAuth0UserIdToExternalUserId : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.RenameColumn(
-            name: "Auth0UserId",
-            table: "User",
-            newName: "ExternalUserId");
+            "Auth0UserId",
+            "User",
+            "ExternalUserId");
 
         migrationBuilder.RenameIndex(
-            name: "IX_User_Auth0UserId",
+            "IX_User_Auth0UserId",
             table: "User",
             newName: "IX_User_ExternalUserId");
     }
@@ -25,12 +25,12 @@ public partial class RenameAuth0UserIdToExternalUserId : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.RenameColumn(
-            name: "ExternalUserId",
-            table: "User",
-            newName: "Auth0UserId");
+            "ExternalUserId",
+            "User",
+            "Auth0UserId");
 
         migrationBuilder.RenameIndex(
-            name: "IX_User_ExternalUserId",
+            "IX_User_ExternalUserId",
             table: "User",
             newName: "IX_User_Auth0UserId");
     }

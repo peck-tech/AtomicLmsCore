@@ -168,8 +168,7 @@ public class TenantDatabaseService(
                     "Failed to create tenant identity after migration for tenant {TenantId}: {Errors}",
                     tenantId,
                     string.Join(", ", identityResult.Errors.Select(e => e.Message)));
-                return Result.Fail(
-                    $"Migration succeeded but failed to create tenant identity: {string.Join(", ", identityResult.Errors.Select(e => e.Message))}");
+                return Result.Fail($"Migration succeeded but failed to create tenant identity: {string.Join(", ", identityResult.Errors.Select(e => e.Message))}");
             }
 
             logger.LogInformation(

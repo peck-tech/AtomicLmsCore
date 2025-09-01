@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AtomicLmsCore.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -35,7 +36,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.HasIndex(u => new { u.Email, u.TenantInternalId })
+        builder.HasIndex(u => new
+        {
+            u.Email,
+            u.TenantInternalId,
+        })
             .HasFilter("[IsDeleted] = 0");
 
         builder.Property(u => u.FirstName)
@@ -75,8 +80,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Metadata)
             .HasConversion(
-                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
-                v => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new Dictionary<string, string>())
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, string>())
             .HasColumnType("nvarchar(max)");
 
         builder.HasOne(u => u.Tenant)

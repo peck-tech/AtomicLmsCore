@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Http;
 namespace AtomicLmsCore.Infrastructure.Services;
 
 /// <summary>
-///     Provides access to the current tenant context from HTTP headers.
+///     Provides access to the current tenant context from validated middleware context.
 /// </summary>
 public class TenantAccessor(IHttpContextAccessor httpContextAccessor) : ITenantAccessor
 {
-    private const string TenantIdHeaderName = "X-Tenant-Id";
+    private const string ValidatedTenantIdKey = "ValidatedTenantId";
 
     /// <inheritdoc />
     public Guid? GetCurrentTenantId()
     {
         var httpContext = httpContextAccessor.HttpContext;
-        if (httpContext?.Request.Headers.TryGetValue(TenantIdHeaderName, out var tenantIdHeader) == true &&
-            Guid.TryParse(tenantIdHeader, out var tenantId))
+        if (httpContext?.Items.TryGetValue(ValidatedTenantIdKey, out var tenantIdItem) == true &&
+            tenantIdItem is Guid tenantId)
         {
             return tenantId;
         }
@@ -32,6 +32,6 @@ public class TenantAccessor(IHttpContextAccessor httpContextAccessor) : ITenantA
             return tenantId.Value;
         }
 
-        throw new InvalidOperationException($"No valid tenant ID found in {TenantIdHeaderName} header");
+        throw new InvalidOperationException("No valid tenant ID found. Ensure TenantValidationMiddleware is properly configured.");
     }
 }

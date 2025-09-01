@@ -125,7 +125,13 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
 
             if (result.IsSuccess)
             {
-                return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new
+                    {
+                        id = result.Value,
+                    },
+                    result.Value);
             }
 
             logger.LogWarning(
