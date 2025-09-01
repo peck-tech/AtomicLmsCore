@@ -115,6 +115,7 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
             var command = new CreateTenantCommand(
                 request.Name,
                 request.Slug,
+                request.DatabaseName,
                 request.IsActive,
                 request.Metadata);
 

@@ -28,6 +28,15 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
             .IsUnique()
             .HasDatabaseName("IX_Tenant_Slug");
 
+        // Configure the DatabaseName property
+        builder.Property(t => t.DatabaseName)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.HasIndex(t => t.DatabaseName)
+            .IsUnique()
+            .HasDatabaseName("IX_Tenant_DatabaseName");
+
         // Configure the IsActive property
         builder.Property(t => t.IsActive)
             .IsRequired()

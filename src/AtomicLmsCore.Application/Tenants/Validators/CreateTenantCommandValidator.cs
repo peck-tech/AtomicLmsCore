@@ -24,6 +24,14 @@ public class CreateTenantCommandValidator : AbstractValidator<CreateTenantComman
             .Matches("^[a-z0-9-]+$")
             .WithMessage("Tenant slug must contain only lowercase letters, numbers, and hyphens.");
 
+        RuleFor(x => x.DatabaseName)
+            .NotEmpty()
+            .WithMessage("Database name is required.")
+            .MaximumLength(255)
+            .WithMessage("Database name must not exceed 255 characters.")
+            .Matches("^[a-zA-Z0-9_]+$")
+            .WithMessage("Database name must contain only letters, numbers, and underscores.");
+
         RuleFor(x => x.Metadata)
             .Must(metadata => metadata == null || metadata.Count <= 50)
             .WithMessage("Metadata cannot contain more than 50 items.");

@@ -27,6 +27,7 @@ public class CreateTenantCommandHandler(ITenantRepository tenantRepository, IIdG
                 Id = idGenerator.NewId(),
                 Name = request.Name,
                 Slug = request.Slug,
+                DatabaseName = request.DatabaseName,
                 IsActive = request.IsActive,
                 Metadata = request.Metadata ?? new Dictionary<string, string>(),
             };

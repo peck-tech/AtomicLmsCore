@@ -33,13 +33,32 @@ public record ErrorResponseDto(
     ///     Creates a system error response.
     /// </summary>
     public static ErrorResponseDto SystemError(string? correlationId = null)
-        => new("System", "An internal server error occurred.", 500,
-            new() { "An error occurred processing your request." }, correlationId);
+        => new(
+            "System",
+            "An internal server error occurred.",
+            500,
+            ["An error occurred processing your request."],
+            correlationId);
 
     /// <summary>
     ///     Creates a not found error response.
     /// </summary>
     public static ErrorResponseDto NotFoundError(string resource, string? correlationId = null)
-        => new("NotFound", "Resource not found.", 404,
-            new() { $"{resource} not found." }, correlationId);
+        => new(
+            "NotFound",
+            "Resource not found.",
+            404,
+            [$"{resource} not found."],
+            correlationId);
+
+    /// <summary>
+    ///     Creates a bad request error response.
+    /// </summary>
+    public static ErrorResponseDto BadRequestError(string message, string? correlationId = null)
+        => new(
+            "BadRequest",
+            "Bad request.",
+            400,
+            [message],
+            correlationId);
 }

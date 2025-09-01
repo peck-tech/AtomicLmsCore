@@ -25,13 +25,16 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         // Apply entity configurations
-        modelBuilder.ApplyConfiguration(new TenantConfiguration());
+        modelBuilder
+            .ApplyConfiguration(new TenantConfiguration())
+            .ApplyConfiguration(new UserConfiguration());
 
         // Configure all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

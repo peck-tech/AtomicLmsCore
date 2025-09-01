@@ -8,10 +8,12 @@ namespace AtomicLmsCore.Application.Tenants.Commands;
 /// </summary>
 /// <param name="Name">The display name of the tenant.</param>
 /// <param name="Slug">The unique slug/alias for the tenant.</param>
+/// <param name="DatabaseName">The name of the tenant's database.</param>
 /// <param name="IsActive">Indicates whether the tenant is currently active.</param>
 /// <param name="Metadata">Additional metadata for the tenant.</param>
 public record CreateTenantCommand(
     string Name,
     string Slug,
+    string DatabaseName,
     bool IsActive = true,
     IDictionary<string, string>? Metadata = null) : IRequest<Result<Guid>>;

@@ -16,6 +16,11 @@ public class Tenant : BaseEntity
     public string Slug { get; set; } = string.Empty;
 
     /// <summary>
+    ///     The name of the tenant's database.
+    /// </summary>
+    public string DatabaseName { get; set; } = string.Empty;
+
+    /// <summary>
     ///     Indicates whether the tenant is currently active.
     /// </summary>
     public bool IsActive { get; set; } = true;

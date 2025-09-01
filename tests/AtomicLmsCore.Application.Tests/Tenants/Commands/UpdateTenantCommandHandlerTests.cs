@@ -1,8 +1,8 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Application.Tenants.Commands;
 using AtomicLmsCore.Domain.Entities;
+using FluentAssertions;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Application.Tests.Tenants.Commands;
 
@@ -35,11 +35,11 @@ public class UpdateTenantCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeTrue();
+        result.IsSuccess.Should().BeTrue();
 
-        existingTenant.Name.ShouldBe("New Name");
-        existingTenant.Slug.ShouldBe("new-slug");
-        existingTenant.IsActive.ShouldBeTrue();
+        existingTenant.Name.Should().Be("New Name");
+        existingTenant.Slug.Should().Be("new-slug");
+        existingTenant.IsActive.Should().BeTrue();
 
         _tenantRepositoryMock.Verify(x => x.UpdateAsync(existingTenant, It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -58,8 +58,8 @@ public class UpdateTenantCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.Message.Contains("Tenant not found"));
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("Tenant not found"));
 
         _tenantRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()),
             Times.Never);
@@ -79,7 +79,7 @@ public class UpdateTenantCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.Message.Contains("Failed to update tenant"));
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("Failed to update tenant"));
     }
 }

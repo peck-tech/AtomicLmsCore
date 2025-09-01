@@ -1,6 +1,6 @@
 - AtomicLMS Core is a headless LMS, intended to be versatile and simple
 - the project is commercial software
-- additions to "Add to docs/CodingStandards.md" should be concise, bulleted lists with headings, deduplicating as necessary.
+- additions to docs/CodingStandards.md and docs/ArchitecturalDecisions.md should be concise, bulleted lists with headings, deduplicating as necessary.
 - Code changes workflow: review and adhere to docs/CodingStandards.md before all code changes
 - Code changes workflow: after completing code changes re-review that they adhere to docs/CodingStandards.md
 - Code changes workflow: create unit tests in accordance docs/UnitTestPolicy.md

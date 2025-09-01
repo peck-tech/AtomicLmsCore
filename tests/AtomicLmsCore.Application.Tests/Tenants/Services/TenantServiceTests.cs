@@ -1,9 +1,9 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Application.Tenants.Services;
 using AtomicLmsCore.Domain.Entities;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Application.Tests.Tenants.Services;
 
@@ -32,8 +32,8 @@ public class TenantServiceTests
 
             var result = await _service.GetByIdAsync(tenantId);
 
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.ShouldBe(tenant);
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(tenant);
         }
 
         [Fact]
@@ -45,9 +45,8 @@ public class TenantServiceTests
 
             var result = await _service.GetByIdAsync(tenantId);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"Tenant with ID {tenantId} not found");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"Tenant with ID {tenantId} not found");
         }
 
         [Fact]
@@ -60,9 +59,8 @@ public class TenantServiceTests
 
             var result = await _service.GetByIdAsync(tenantId);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"An error occurred while retrieving the tenant: {exception.Message}");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"An error occurred while retrieving the tenant: {exception.Message}");
         }
     }
 
@@ -80,8 +78,8 @@ public class TenantServiceTests
 
             var result = await _service.GetAllAsync();
 
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.ShouldBeEquivalentTo(tenants);
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().BeEquivalentTo(tenants);
         }
 
         [Fact]
@@ -93,9 +91,8 @@ public class TenantServiceTests
 
             var result = await _service.GetAllAsync();
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"An error occurred while retrieving tenants: {exception.Message}");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"An error occurred while retrieving tenants: {exception.Message}");
         }
     }
 
@@ -112,8 +109,8 @@ public class TenantServiceTests
 
             var result = await _service.CreateAsync(name);
 
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.ShouldBe(createdId);
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(createdId);
             _repositoryMock.Verify(r => r.AddAsync(It.Is<Tenant>(t => t.Name == name), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -123,9 +120,8 @@ public class TenantServiceTests
         {
             var result = await _service.CreateAsync(null);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe("Tenant name is required");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == "Tenant name is required");
             _repositoryMock.Verify(r => r.AddAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
@@ -134,9 +130,8 @@ public class TenantServiceTests
         {
             var result = await _service.CreateAsync("");
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe("Tenant name is required");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == "Tenant name is required");
         }
 
         [Fact]
@@ -144,9 +139,8 @@ public class TenantServiceTests
         {
             var result = await _service.CreateAsync("   ");
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe("Tenant name is required");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == "Tenant name is required");
         }
 
         [Fact]
@@ -159,9 +153,8 @@ public class TenantServiceTests
 
             var result = await _service.CreateAsync(name);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"An error occurred while creating the tenant: {exception.Message}");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"An error occurred while creating the tenant: {exception.Message}");
         }
     }
 
@@ -181,8 +174,8 @@ public class TenantServiceTests
 
             var result = await _service.UpdateAsync(tenantId, updatedName);
 
-            result.IsSuccess.ShouldBeTrue();
-            tenant.Name.ShouldBe(updatedName);
+            result.IsSuccess.Should().BeTrue();
+            tenant.Name.Should().Be(updatedName);
             _repositoryMock.Verify(r => r.UpdateAsync(tenant, It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -193,9 +186,8 @@ public class TenantServiceTests
 
             var result = await _service.UpdateAsync(tenantId, null);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe("Tenant name is required");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == "Tenant name is required");
         }
 
         [Fact]
@@ -207,9 +199,8 @@ public class TenantServiceTests
 
             var result = await _service.UpdateAsync(tenantId, "Updated Name");
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"Tenant with ID {tenantId} not found");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"Tenant with ID {tenantId} not found");
         }
 
         [Fact]
@@ -222,9 +213,8 @@ public class TenantServiceTests
 
             var result = await _service.UpdateAsync(tenantId, "Updated Name");
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"An error occurred while updating the tenant: {exception.Message}");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"An error occurred while updating the tenant: {exception.Message}");
         }
     }
 
@@ -239,7 +229,7 @@ public class TenantServiceTests
 
             var result = await _service.DeleteAsync(tenantId);
 
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.Should().BeTrue();
             _repositoryMock.Verify(r => r.DeleteAsync(tenantId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -252,9 +242,8 @@ public class TenantServiceTests
 
             var result = await _service.DeleteAsync(tenantId);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"Tenant with ID {tenantId} not found");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"Tenant with ID {tenantId} not found");
         }
 
         [Fact]
@@ -267,9 +256,8 @@ public class TenantServiceTests
 
             var result = await _service.DeleteAsync(tenantId);
 
-            result.IsFailed.ShouldBeTrue();
-            result.Errors.ShouldHaveSingleItem()
-                .Message.ShouldBe($"An error occurred while deleting the tenant: {exception.Message}");
+            result.IsFailed.Should().BeTrue();
+            result.Errors.Should().ContainSingle(e => e.Message == $"An error occurred while deleting the tenant: {exception.Message}");
         }
     }
 }

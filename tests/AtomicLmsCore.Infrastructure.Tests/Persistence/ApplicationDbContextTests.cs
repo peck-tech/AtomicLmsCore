@@ -2,9 +2,9 @@ using AtomicLmsCore.Domain;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Infrastructure.Tests.Persistence;
 
@@ -45,21 +45,21 @@ public class ApplicationDbContextTests : IDisposable
 
         await _context.SaveChangesAsync();
 
-        tenant.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
-        tenant.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
-        (tenant.CreatedAt - tenant.UpdatedAt).Duration().ShouldBeLessThan(TimeSpan.FromMilliseconds(1));
+        tenant.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        tenant.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        (tenant.CreatedAt - tenant.UpdatedAt).Duration().Should().BeLessThan(TimeSpan.FromMilliseconds(1));
     }
 
     [Fact]
     public async Task SaveChangesAsync_SetsId_ForNewEntitiesWithoutId()
     {
         var tenant = CreateTestTenant("New Tenant");
-        tenant.Id.ShouldBe(Guid.Empty);
+        tenant.Id.Should().Be(Guid.Empty);
 
         _context.Tenants.Add(tenant);
         await _context.SaveChangesAsync();
 
-        tenant.Id.ShouldBe(_generatedId);
+        tenant.Id.Should().Be(_generatedId);
         _idGeneratorMock.Verify(x => x.NewId(), Times.Once);
     }
 
@@ -73,7 +73,7 @@ public class ApplicationDbContextTests : IDisposable
         _context.Tenants.Add(tenant);
         await _context.SaveChangesAsync();
 
-        tenant.Id.ShouldBe(existingId);
+        tenant.Id.Should().Be(existingId);
         _idGeneratorMock.Verify(x => x.NewId(), Times.Never);
     }
 
@@ -91,9 +91,9 @@ public class ApplicationDbContextTests : IDisposable
         _context.Entry(tenant).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
-        tenant.UpdatedAt.ShouldBeGreaterThan(originalUpdatedAt);
-        tenant.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
-        tenant.CreatedAt.ShouldBe(tenant.CreatedAt);
+        tenant.UpdatedAt.Should().BeAfter(originalUpdatedAt);
+        tenant.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        tenant.CreatedAt.Should().Be(tenant.CreatedAt);
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class ApplicationDbContextTests : IDisposable
         _context.Entry(tenant).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
-        tenant.CreatedAt.ShouldBe(originalCreatedAt);
+        tenant.CreatedAt.Should().Be(originalCreatedAt);
     }
 
     [Fact]
@@ -130,9 +130,9 @@ public class ApplicationDbContextTests : IDisposable
         var tenants = await _context.Tenants.ToListAsync();
 
         // Query filter should exclude deleted entities
-        tenants.Count.ShouldBe(1);
-        tenants.ShouldContain(t => t.Id == activeTenant.Id);
-        tenants.ShouldNotContain(t => t.Id == deletedTenant.Id);
+        tenants.Count.Should().Be(1);
+        tenants.Should().Contain(t => t.Id == activeTenant.Id);
+        tenants.Should().NotContain(t => t.Id == deletedTenant.Id);
     }
 
     [Fact]
@@ -152,9 +152,9 @@ public class ApplicationDbContextTests : IDisposable
 
         var tenants = await _context.Tenants.IgnoreQueryFilters().ToListAsync();
 
-        tenants.Count.ShouldBe(2);
-        tenants.ShouldContain(t => t.Id == activeTenant.Id);
-        tenants.ShouldContain(t => t.Id == deletedTenant.Id);
+        tenants.Count.Should().Be(2);
+        tenants.Should().Contain(t => t.Id == activeTenant.Id);
+        tenants.Should().Contain(t => t.Id == deletedTenant.Id);
     }
 
     [Fact]
@@ -168,12 +168,12 @@ public class ApplicationDbContextTests : IDisposable
         _context.Tenants.AddRange(tenant1, tenant2, tenant3);
         await _context.SaveChangesAsync();
 
-        tenant1.Id.ShouldNotBe(Guid.Empty);
-        tenant2.Id.ShouldNotBe(Guid.Empty);
-        tenant3.Id.ShouldNotBe(_generatedId);
+        tenant1.Id.Should().NotBe(Guid.Empty);
+        tenant2.Id.Should().NotBe(Guid.Empty);
+        tenant3.Id.Should().NotBe(_generatedId);
 
-        tenant1.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
-        tenant2.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
-        tenant3.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+        tenant1.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        tenant2.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        tenant3.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 }

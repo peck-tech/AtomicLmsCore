@@ -1,5 +1,5 @@
 using AtomicLmsCore.Domain.Entities;
-using Shouldly;
+using FluentAssertions;
 
 namespace AtomicLmsCore.Domain.Tests.Entities;
 
@@ -10,7 +10,7 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.ShouldBeAssignableTo<BaseEntity>();
+        tenant.Should().BeAssignableTo<BaseEntity>();
     }
 
     [Fact]
@@ -18,7 +18,7 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Name.ShouldBe(string.Empty);
+        tenant.Name.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class TenantTests
     {
         var tenant = new Tenant { Name = "Test Tenant" };
 
-        tenant.Name.ShouldBe("Test Tenant");
+        tenant.Name.Should().Be("Test Tenant");
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Slug.ShouldBe(string.Empty);
+        tenant.Slug.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class TenantTests
     {
         var tenant = new Tenant { Slug = "test-tenant" };
 
-        tenant.Slug.ShouldBe("test-tenant");
+        tenant.Slug.Should().Be("test-tenant");
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.IsActive.ShouldBeTrue();
+        tenant.IsActive.Should().BeTrue();
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class TenantTests
     {
         var tenant = new Tenant { IsActive = false };
 
-        tenant.IsActive.ShouldBeFalse();
+        tenant.IsActive.Should().BeFalse();
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Metadata.ShouldNotBeNull();
-        tenant.Metadata.ShouldBeEmpty();
+        tenant.Metadata.Should().NotBeNull();
+        tenant.Metadata.Should().BeEmpty();
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class TenantTests
 
         var tenant = new Tenant { Metadata = metadata };
 
-        tenant.Metadata.ShouldBeEquivalentTo(metadata);
+        tenant.Metadata.Should().BeEquivalentTo(metadata);
     }
 
     [Fact]
@@ -85,12 +85,12 @@ public class TenantTests
     {
         var tenant = new Tenant();
 
-        tenant.Id.ShouldBe(Guid.Empty);
-        tenant.InternalId.ShouldBe(0);
-        tenant.CreatedAt.ShouldBe(default);
-        tenant.UpdatedAt.ShouldBe(default);
-        tenant.CreatedBy.ShouldBe(string.Empty);
-        tenant.UpdatedBy.ShouldBe(string.Empty);
-        tenant.IsDeleted.ShouldBeFalse();
+        tenant.Id.Should().Be(Guid.Empty);
+        tenant.InternalId.Should().Be(0);
+        tenant.CreatedAt.Should().Be(default);
+        tenant.UpdatedAt.Should().Be(default);
+        tenant.CreatedBy.Should().Be(string.Empty);
+        tenant.UpdatedBy.Should().Be(string.Empty);
+        tenant.IsDeleted.Should().BeFalse();
     }
 }

@@ -1,8 +1,8 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Application.Tenants.Queries;
 using AtomicLmsCore.Domain.Entities;
+using FluentAssertions;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Application.Tests.Tenants.Queries;
 
@@ -32,10 +32,10 @@ public class GetTenantByIdQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldBe(tenant);
-        result.Value.Id.ShouldBe(tenantId);
-        result.Value.Name.ShouldBe("Test Tenant");
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(tenant);
+        result.Value.Id.Should().Be(tenantId);
+        result.Value.Name.Should().Be("Test Tenant");
     }
 
     [Fact]
@@ -52,8 +52,8 @@ public class GetTenantByIdQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.Message.Contains("Tenant not found"));
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("Tenant not found"));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class GetTenantByIdQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.Message.Contains("Failed to retrieve tenant"));
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("Failed to retrieve tenant"));
     }
 }

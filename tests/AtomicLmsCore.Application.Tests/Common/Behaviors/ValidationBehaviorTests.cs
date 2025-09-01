@@ -1,9 +1,9 @@
 using AtomicLmsCore.Application.Common.Behaviors;
+using FluentAssertions;
 using FluentResults;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Application.Tests.Common.Behaviors;
 
@@ -26,6 +26,7 @@ public class ValidationBehaviorTests
         var mockLogger = new Mock<ILogger<ValidationBehavior<object, Result>>>();
 
         // This should compile without errors, proving our ValidationBehavior is correctly structured
-        Should.NotThrow(() => new ValidationBehavior<object, Result>(validators, mockLogger.Object));
+        Action act = () => new ValidationBehavior<object, Result>(validators, mockLogger.Object);
+        act.Should().NotThrow();
     }
 }

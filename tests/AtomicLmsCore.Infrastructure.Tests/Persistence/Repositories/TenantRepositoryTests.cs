@@ -3,23 +3,23 @@ using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Persistence.Repositories;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Infrastructure.Tests.Persistence.Repositories;
 
 public class TenantRepositoryTests : IDisposable
 {
-    private readonly ApplicationDbContext _context;
+    private readonly SolutionsDbContext _context;
     private readonly Mock<IIdGenerator> _idGeneratorMock;
     private readonly Mock<ILogger<TenantRepository>> _loggerMock;
     private readonly TenantRepository _repository;
 
     public TenantRepositoryTests()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        var options = new DbContextOptionsBuilder<SolutionsDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
@@ -55,11 +55,11 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetByIdAsync(tenant.Id);
 
-            result.ShouldNotBeNull();
-            result.Id.ShouldBe(tenant.Id);
-            result.Name.ShouldBe(tenant.Name);
-            result.Slug.ShouldBe(tenant.Slug);
-            result.IsActive.ShouldBe(tenant.IsActive);
+            result.Should().NotBeNull();
+            result.Id.Should().Be(tenant.Id);
+            result.Name.Should().Be(tenant.Name);
+            result.Slug.Should().Be(tenant.Slug);
+            result.IsActive.Should().Be(tenant.IsActive);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetByIdAsync(nonExistentId);
 
-            result.ShouldBeNull();
+            result.Should().BeNull();
         }
 
         [Fact]
@@ -87,7 +87,7 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetByIdAsync(tenant.Id);
 
-            result.ShouldBeNull();
+            result.Should().BeNull();
         }
     }
 
@@ -110,10 +110,10 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.GetAllAsync();
 
-            result.Count.ShouldBe(2);
-            result.ShouldContain(t => t.Id == tenant1.Id);
-            result.ShouldContain(t => t.Id == tenant2.Id);
-            result.ShouldNotContain(t => t.Id == deletedTenant.Id);
+            result.Count.Should().Be(2);
+            result.Should().Contain(t => t.Id == tenant1.Id);
+            result.Should().Contain(t => t.Id == tenant2.Id);
+            result.Should().NotContain(t => t.Id == deletedTenant.Id);
         }
 
         [Fact]
@@ -121,8 +121,8 @@ public class TenantRepositoryTests : IDisposable
         {
             var result = await _repository.GetAllAsync();
 
-            result.ShouldNotBeNull();
-            result.ShouldBeEmpty();
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
         }
     }
 
@@ -135,14 +135,14 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.AddAsync(tenant);
 
-            result.ShouldNotBeNull();
-            result.Id.ShouldNotBe(Guid.Empty);
-            result.Name.ShouldBe("New Tenant");
-            result.CreatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
-            result.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+            result.Should().NotBeNull();
+            result.Id.Should().NotBe(Guid.Empty);
+            result.Name.Should().Be("New Tenant");
+            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+            result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
 
             var savedTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == result.Id);
-            savedTenant.ShouldNotBeNull();
+            savedTenant.Should().NotBeNull();
         }
 
         [Fact]
@@ -152,7 +152,7 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.AddAsync(tenant);
 
-            result.InternalId.ShouldBeGreaterThan(0);
+            result.InternalId.Should().BeGreaterThan(0);
         }
     }
 
@@ -169,8 +169,8 @@ public class TenantRepositoryTests : IDisposable
             await _repository.UpdateAsync(tenant);
 
             var updatedTenant = await _context.Tenants.FirstAsync(t => t.Id == tenant.Id);
-            updatedTenant.Name.ShouldBe("Updated Name");
-            updatedTenant.UpdatedAt.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow.AddSeconds(1));
+            updatedTenant.Name.Should().Be("Updated Name");
+            updatedTenant.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         }
     }
 
@@ -185,14 +185,14 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.DeleteAsync(tenant.Id);
 
-            result.ShouldBeTrue();
+            result.Should().BeTrue();
 
             var deletedTenant = await _context.Tenants
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == tenant.Id);
 
-            deletedTenant.ShouldNotBeNull();
-            deletedTenant.IsDeleted.ShouldBeTrue();
+            deletedTenant.Should().NotBeNull();
+            deletedTenant.IsDeleted.Should().BeTrue();
         }
 
         [Fact]
@@ -202,7 +202,7 @@ public class TenantRepositoryTests : IDisposable
 
             var result = await _repository.DeleteAsync(nonExistentId);
 
-            result.ShouldBeFalse();
+            result.Should().BeFalse();
         }
 
         [Fact]
@@ -219,7 +219,7 @@ public class TenantRepositoryTests : IDisposable
             // Try to delete again
             var result = await _repository.DeleteAsync(tenant.Id);
 
-            result.ShouldBeFalse();
+            result.Should().BeFalse();
         }
     }
 }

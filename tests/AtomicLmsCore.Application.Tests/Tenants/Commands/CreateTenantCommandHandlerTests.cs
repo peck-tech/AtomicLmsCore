@@ -2,8 +2,8 @@ using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Application.Tenants.Commands;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
+using FluentAssertions;
 using Moq;
-using Shouldly;
 
 namespace AtomicLmsCore.Application.Tests.Tenants.Commands;
 
@@ -25,7 +25,7 @@ public class CreateTenantCommandHandlerTests
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        var command = new CreateTenantCommand("Test Tenant", "test-tenant");
+        var command = new CreateTenantCommand("Test Tenant", "test-tenant", "test_tenant_db");
         var expectedTenant = new Tenant { Id = tenantId, Name = "Test Tenant", Slug = "test-tenant", IsActive = true };
 
         _idGeneratorMock.Setup(x => x.NewId()).Returns(tenantId);
@@ -36,8 +36,8 @@ public class CreateTenantCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldBe(tenantId);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(tenantId);
 
         _tenantRepositoryMock.Verify(x => x.AddAsync(
             It.Is<Tenant>(t =>
@@ -55,7 +55,7 @@ public class CreateTenantCommandHandlerTests
         // Arrange
         var tenantId = Guid.NewGuid();
         var metadata = new Dictionary<string, string> { { "key", "value" } };
-        var command = new CreateTenantCommand("Test Tenant", "test-tenant", true, metadata);
+        var command = new CreateTenantCommand("Test Tenant", "test-tenant", "test_tenant_db", true, metadata);
 
         _idGeneratorMock.Setup(x => x.NewId()).Returns(tenantId);
         _tenantRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()))
@@ -65,8 +65,8 @@ public class CreateTenantCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.ShouldBe(tenantId);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(tenantId);
 
         _tenantRepositoryMock.Verify(x => x.AddAsync(
             It.Is<Tenant>(t =>
@@ -79,7 +79,7 @@ public class CreateTenantCommandHandlerTests
     public async Task Handle_Should_Return_Failure_When_Repository_Throws_Exception()
     {
         // Arrange
-        var command = new CreateTenantCommand("Test Tenant", "test-tenant");
+        var command = new CreateTenantCommand("Test Tenant", "test-tenant", "test_tenant_db");
 
         _idGeneratorMock.Setup(x => x.NewId()).Returns(Guid.NewGuid());
         _tenantRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Tenant>(), It.IsAny<CancellationToken>()))
@@ -89,7 +89,7 @@ public class CreateTenantCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.Message.Contains("Failed to create tenant"));
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("Failed to create tenant"));
     }
 }

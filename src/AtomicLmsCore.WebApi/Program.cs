@@ -43,16 +43,75 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v0.1", openApiInfo);
 });
 
+// Register core services
 builder.Services.AddScoped<IIdGenerator, UlidIdGenerator>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantAccessor, TenantAccessor>();
+builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
+builder.Services.AddScoped<IDatabaseOperations, SqlServerDatabaseOperations>();
+builder.Services.AddScoped<ITenantDatabaseValidator, TenantDatabaseValidator>();
+builder.Services.AddScoped<ITenantDatabaseService, TenantDatabaseService>();
+
+// Register Solutions database context and repositories
+builder.Services.AddScoped(serviceProvider =>
+{
+    var connectionStringProvider = serviceProvider.GetRequiredService<IConnectionStringProvider>();
+    var connectionString = connectionStringProvider.GetSolutionsConnectionString();
+
+    var options = new DbContextOptionsBuilder<SolutionsDbContext>()
+        .UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(SolutionsDbContext).Assembly.FullName))
+        .Options;
+
+    return new SolutionsDbContext(options);
+});
+
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+// Register Tenant database context and repositories
+builder.Services.AddScoped(serviceProvider =>
+{
+    var tenantAccessor = serviceProvider.GetRequiredService<ITenantAccessor>();
+    var connectionStringProvider = serviceProvider.GetRequiredService<IConnectionStringProvider>();
+    var tenantRepository = serviceProvider.GetRequiredService<ITenantRepository>();
+    var idGenerator = serviceProvider.GetRequiredService<IIdGenerator>();
 
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<TenantMappingProfile>());
+    var currentTenantId = tenantAccessor.GetCurrentTenantId();
+    if (!currentTenantId.HasValue)
+    {
+        // Return a dummy context for DI registration validation
+        var dummyOptions = new DbContextOptionsBuilder<TenantDbContext>()
+            .UseInMemoryDatabase("DummyTenant")
+            .Options;
+        return new(dummyOptions, idGenerator);
+    }
+
+    // Look up the tenant to get the database name
+    var tenant = tenantRepository.GetByIdAsync(currentTenantId.Value).GetAwaiter().GetResult();
+    if (tenant == null || string.IsNullOrEmpty(tenant.DatabaseName))
+    {
+        // Return a dummy context if tenant not found or no database name
+        var dummyOptions = new DbContextOptionsBuilder<TenantDbContext>()
+            .UseInMemoryDatabase("DummyTenant")
+            .Options;
+        return new(dummyOptions, idGenerator);
+    }
+
+    var connectionString = connectionStringProvider.GetTenantConnectionString(tenant.DatabaseName);
+    var options = new DbContextOptionsBuilder<TenantDbContext>()
+        .UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(TenantDbContext).Assembly.FullName))
+        .Options;
+
+    return new TenantDbContext(options, idGenerator);
+});
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<TenantMappingProfile>();
+    cfg.AddProfile<UserMappingProfile>();
+});
 
 builder.Services.AddMediatR(cfg =>
 {

@@ -1,8 +1,5 @@
 # AtomicLMS Core Coding Standards
 
-## Overview
-Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and simple. App is multi tenant intended to be SAAS.
-
 ## Code Organization
 
 ### Architecture Patterns
@@ -13,17 +10,16 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 ### CQRS-Specific
 - Commands should return only IDs, not full objects
 - Queries should bypass domain logic entirely
-- Event sourcing for critical student progress tracking
 
 ### Project Structure
 - Group related functionality together by feature
 
-### C# Standards
+## C# Standards
 - Support a Fluent coding style where possible by returning this instead of void
 - Mutate objects through predicates
 - Public methods on the service layer, and domain modals, should include full XML documentation
 
-### ASP.NET Core Standards
+## ASP.NET Core Standards
 - Use as much config as possible, provided via IOptions pattern
 - Use Automapper to map between Entities, Domain Models, and DTOs
 - Use IHostedService for background tasks
@@ -37,9 +33,6 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Exceptions should not be used to control code flow
 - Caught exceptions should be logged to ILogger
 - API should be versioned using ApiVersionAttribute
-- API methods will be put in to the feature bucket: Solution (management of tenants and other super-admin level calls), Administration (for a tenant to manage their setup), Learning (setting up courses), Learners (setting up users), and Engagement (actions by learners)
-- Feature buckets should be represented in the API path structure: `api/v{version}/solution/...`, `api/v{version}/administration/...`, `api/v{version}/learning/...`, `api/v{version}/learners/...`, `api/v{version}/engagement/...`
-- API calls in all feature buckets other than Solution must include a tenant ID provided as a header, otherwise a bad request should be returned
 - Use ErrorResponseDto for all error responses to ensure consistency
 
 ## Identifiers
@@ -52,13 +45,6 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Expose a canonical ID in endpoints (/entities/{id}), and provide alternate lookup routes when needed (/entities/by-slug/{slug})
 - Prefer sequential GUIDs (UUIDv7/ULID) over random GUIDs to reduce index fragmentation when possible
 
-## Domain-Specific Standards
-- Soft deletes by default for all student/course data
-- Immutable audit logs for all grade/enrollment changes
-- Audit Fields should be set in the Infrastructure project, and readonly in the models
-- All major entities should have metadata (IDictionary<string,string>)
-- Metadata should not be returned in listing actions
-
 ## Database Conventions
 
 ### Entity Framework Core Standards
@@ -70,6 +56,7 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 - Enable query splitting for complex includes
 - Use compiled queries for frequently executed queries
 - Use temporal tables for audit trails
+- Ensure appropriate indexes are configured for all query patterns (including composite indexes for multi-column queries)
 
 ### Naming
 - Use singular table names (Course, not Courses)
@@ -91,21 +78,22 @@ Coding standards for AtomicLMS Core, a headless LMS designed to be versatile and
 
 ## Testing Standards
 - Add unit tests where possible to maximise code coverage
+- Use XUnit as the test framework for all unit and integration tests
+- Use Moq for mocking dependencies in unit tests
+- Use FluentAssertions (v7) for readable test assertions
+- Test class setup should use constructor injection, cleanup via IDisposable
 
 ## Development Workflow
 - When making code changes, the project must be formatted, built, and tests run
-
-## LMS-Specific Conventions
-- Enrollment state machines should be explicit
-- Grade calculations must be idempotent
-- Progress tracking should be eventually consistent
+- Code must not be committed if StyleCop violations remain unresolved
+- Code must not be committed if unit tests are failing
 
 ## Security Standards
 - Follow OWASP security guidelines
 - Authentication for all controllers should be provided through Auth0
 
 ## Validation
-- Validate at the boundaries (controllers, message handlers) for request shape & permissions.
-- Enforce business rules/invariants in the domain/service layer (so all call paths are covered).
-- Repositories shouldn’t validate; they persist aggregates and rely on DB constraints as a safety net.
-- Structure validation so rules live in one place and are reused (validators, value objects, entity methods).
+- Validate at the boundaries (controllers, message handlers) for request shape & permissions
+- Enforce business rules/invariants in the domain/service layer (so all call paths are covered)
+- Repositories shouldn't validate; they persist aggregates and rely on DB constraints as a safety net
+- Structure validation so rules live in one place and are reused (validators, value objects, entity methods)

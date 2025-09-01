@@ -4,7 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AtomicLmsCore.Infrastructure.Persistence.Repositories;
 
-public class TenantRepository(ApplicationDbContext context) : ITenantRepository
+/// <summary>
+///     Repository for Tenant entity operations using the Solutions database.
+/// </summary>
+public class TenantRepository(SolutionsDbContext context) : ITenantRepository
 {
     public async Task<Tenant?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         await context.Set<Tenant>()
