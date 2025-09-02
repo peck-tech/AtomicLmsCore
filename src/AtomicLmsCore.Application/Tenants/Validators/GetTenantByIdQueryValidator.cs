@@ -1,6 +1,5 @@
 using AtomicLmsCore.Application.Tenants.Queries;
 using FluentValidation;
-using JetBrains.Annotations;
 
 namespace AtomicLmsCore.Application.Tenants.Validators;
 
