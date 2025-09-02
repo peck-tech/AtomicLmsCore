@@ -239,7 +239,7 @@ public class UpdateTenantCommandValidatorTests
         {
             // Arrange
             var metadata = new Dictionary<string, string>();
-            for (int i = 0; i < 51; i++)
+            for (var i = 0; i < 51; i++)
             {
                 metadata[$"key{i}"] = $"value{i}";
             }
@@ -306,7 +306,7 @@ public class UpdateTenantCommandValidatorTests
         {
             // Arrange
             var metadata = new Dictionary<string, string>();
-            for (int i = 0; i < 50; i++)
+            for (var i = 0; i < 50; i++)
             {
                 var key = $"key{i}";
                 var value = new string('v', 100); // Well within the 1000 char limit
@@ -343,10 +343,11 @@ public class UpdateTenantCommandValidatorTests
 
             // Assert
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().HaveCount(3);
+            result.Errors.Should().HaveCount(4); // Empty slug triggers both required and format validation
             result.Errors.Should().Contain(e => e.ErrorMessage == "Tenant ID is required.");
             result.Errors.Should().Contain(e => e.ErrorMessage == "Tenant name is required.");
             result.Errors.Should().Contain(e => e.ErrorMessage == "Tenant slug is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Tenant slug must contain only lowercase letters, numbers, and hyphens.");
         }
 
         [Fact]

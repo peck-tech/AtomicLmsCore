@@ -48,7 +48,7 @@ public class GetAllLearningObjectsQueryHandlerTests
         // Arrange
         var learningObjects = new List<LearningObject>();
         var query = new GetAllLearningObjectsQuery();
-        
+
         _repositoryMock.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(learningObjects);
 
@@ -106,15 +106,15 @@ public class GetAllLearningObjectsQueryHandlerTests
         // Arrange
         var learningObjects = new List<LearningObject>
         {
-            new() 
-            { 
-                Id = Guid.NewGuid(), 
-                Name = "Learning Object with Metadata", 
-                Metadata = new Dictionary<string, string> 
-                { 
-                    { "author", "John Doe" }, 
-                    { "version", "1.0" } 
-                } 
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Learning Object with Metadata",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "author", "John Doe" },
+                    { "version", "1.0" }
+                }
             }
         };
 
@@ -140,7 +140,7 @@ public class GetAllLearningObjectsQueryHandlerTests
         // Arrange
         var learningObjects = new List<LearningObject>();
         var query = new GetAllLearningObjectsQuery();
-        
+
         _repositoryMock.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(learningObjects);
 

@@ -21,27 +21,27 @@ public class ConnectionStringProviderTests
     {
         // Arrange
         var expectedConnectionString = "Server=localhost;Database=Solutions;";
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(expectedConnectionString);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:SolutionsDatabase"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+
+        mockConnectionStringsSection.Setup(x => x["SolutionsDatabase"]).Returns(expectedConnectionString);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = _provider.GetSolutionsConnectionString();
 
         // Assert
         result.Should().Be(expectedConnectionString);
-        _mockConfiguration.Verify(x => x.GetSection("ConnectionStrings:SolutionsDatabase"), Times.Once);
     }
 
     [Fact]
     public void GetSolutionsConnectionString_MissingConnectionString_ThrowsInvalidOperationException()
     {
         // Arrange
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns((string?)null);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:SolutionsDatabase"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["SolutionsDatabase"]).Returns((string?)null);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act & Assert
         var action = () => _provider.GetSolutionsConnectionString();
@@ -53,10 +53,10 @@ public class ConnectionStringProviderTests
     public void GetSolutionsConnectionString_EmptyConnectionString_ThrowsInvalidOperationException()
     {
         // Arrange
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(string.Empty);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:SolutionsDatabase"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["SolutionsDatabase"]).Returns(string.Empty);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act & Assert
         var action = () => _provider.GetSolutionsConnectionString();
@@ -72,10 +72,10 @@ public class ConnectionStringProviderTests
         var databaseName = "TenantDb123";
         var expectedResult = "Server=localhost;Database=TenantDb123;";
 
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(template);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns(template);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = _provider.GetTenantConnectionString(databaseName);
@@ -92,10 +92,10 @@ public class ConnectionStringProviderTests
         var databaseName = "TenantDb123";
         var expectedResult = "Server=localhost;Database=TenantDb123;Initial Catalog=TenantDb123;";
 
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(template);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns(template);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = _provider.GetTenantConnectionString(databaseName);
@@ -108,10 +108,10 @@ public class ConnectionStringProviderTests
     public void GetTenantConnectionString_MissingTemplate_ThrowsInvalidOperationException()
     {
         // Arrange
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns((string?)null);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns((string?)null);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act & Assert
         var action = () => _provider.GetTenantConnectionString("TestDb");
@@ -123,10 +123,10 @@ public class ConnectionStringProviderTests
     public void GetTenantConnectionString_EmptyTemplate_ThrowsInvalidOperationException()
     {
         // Arrange
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(string.Empty);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns(string.Empty);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act & Assert
         var action = () => _provider.GetTenantConnectionString("TestDb");
@@ -138,10 +138,10 @@ public class ConnectionStringProviderTests
     public async Task TenantDatabaseExistsAsync_NoMasterConnectionString_ReturnsTrue()
     {
         // Arrange
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns((string?)null);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:MasterDatabase"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["MasterDatabase"]).Returns((string?)null);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = await _provider.TenantDatabaseExistsAsync("TestDb");
@@ -154,10 +154,10 @@ public class ConnectionStringProviderTests
     public async Task TenantDatabaseExistsAsync_EmptyMasterConnectionString_ReturnsTrue()
     {
         // Arrange
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(string.Empty);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:MasterDatabase"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["MasterDatabase"]).Returns(string.Empty);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = await _provider.TenantDatabaseExistsAsync("TestDb");
@@ -176,10 +176,10 @@ public class ConnectionStringProviderTests
         var template = "Server=localhost;Database={DatabaseName};Trusted_Connection=true;";
         var expectedResult = $"Server=localhost;Database={databaseName};Trusted_Connection=true;";
 
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(template);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns(template);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = _provider.GetTenantConnectionString(databaseName);
@@ -196,10 +196,10 @@ public class ConnectionStringProviderTests
         var databaseName = "Tenant_Db-123.Test";
         var expectedResult = "Server=localhost;Database=Tenant_Db-123.Test;";
 
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(template);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns(template);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = _provider.GetTenantConnectionString(databaseName);
@@ -216,10 +216,10 @@ public class ConnectionStringProviderTests
         var databaseName = "TestDb";
         var expectedResult = "Server=localhost;Database=TestDb;Catalog={databasename};"; // Only exact case match replaced
 
-        var mockConnectionStringSection = new Mock<IConfigurationSection>();
-        mockConnectionStringSection.Setup(x => x.Value).Returns(template);
-        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings:TenantDatabaseTemplate"))
-            .Returns(mockConnectionStringSection.Object);
+        var mockConnectionStringsSection = new Mock<IConfigurationSection>();
+        mockConnectionStringsSection.Setup(x => x["TenantDatabaseTemplate"]).Returns(template);
+        _mockConfiguration.Setup(x => x.GetSection("ConnectionStrings"))
+            .Returns(mockConnectionStringsSection.Object);
 
         // Act
         var result = _provider.GetTenantConnectionString(databaseName);

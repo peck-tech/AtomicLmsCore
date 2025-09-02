@@ -329,9 +329,10 @@ public class UpdateUserCommandValidatorTests
 
             // Assert
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().HaveCount(5);
+            result.Errors.Should().HaveCount(6); // Empty email triggers both required and valid email validation
             result.Errors.Should().Contain(e => e.ErrorMessage == "User ID is required");
             result.Errors.Should().Contain(e => e.ErrorMessage == "Email is required");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email must be a valid email address");
             result.Errors.Should().Contain(e => e.ErrorMessage == "First name is required");
             result.Errors.Should().Contain(e => e.ErrorMessage == "Last name is required");
             result.Errors.Should().Contain(e => e.ErrorMessage == "Display name is required");

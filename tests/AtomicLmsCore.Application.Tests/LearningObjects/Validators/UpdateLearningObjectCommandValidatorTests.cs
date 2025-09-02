@@ -232,8 +232,8 @@ public class UpdateLearningObjectCommandValidatorTests
         public void Validate_WhenMultipleMetadataKeysInvalid_ReturnsAllErrors()
         {
             // Arrange
-            var metadata = new Dictionary<string, string> 
-            { 
+            var metadata = new Dictionary<string, string>
+            {
                 { "", "value1" },
                 { "   ", "value2" },
                 { "validkey", null! }
@@ -279,8 +279,8 @@ public class UpdateLearningObjectCommandValidatorTests
         public void Validate_WhenMetadataHasSpecialCharactersInKey_PassesValidation()
         {
             // Arrange
-            var metadata = new Dictionary<string, string> 
-            { 
+            var metadata = new Dictionary<string, string>
+            {
                 { "key-with-dashes", "value1" },
                 { "key_with_underscores", "value2" },
                 { "key.with.dots", "value3" },
