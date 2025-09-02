@@ -192,7 +192,7 @@ public class TenantDatabaseServiceTests
                 .ReturnsAsync(Result.Ok());
 
             // Act
-            var result = await _service.CreateTenantDatabaseAsync(tenantId);
+            _ = await _service.CreateTenantDatabaseAsync(tenantId);
 
             // Assert
             // Verify identity creation was attempted (regardless of other failures)
@@ -289,7 +289,7 @@ public class TenantDatabaseServiceTests
                 .ReturnsAsync(Result.Ok());
 
             // Act
-            var result = await _service.MigrateTenantDatabaseAsync(tenantId);
+            _ = await _service.MigrateTenantDatabaseAsync(tenantId);
 
             // Assert - Verification of security behavior
             _tenantDatabaseValidatorMock.Verify(

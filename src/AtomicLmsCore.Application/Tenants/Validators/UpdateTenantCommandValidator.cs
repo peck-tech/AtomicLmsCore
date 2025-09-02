@@ -7,7 +7,6 @@ namespace AtomicLmsCore.Application.Tenants.Validators;
 /// <summary>
 ///     Validator for UpdateTenantCommand.
 /// </summary>
-[UsedImplicitly]
 public class UpdateTenantCommandValidator : AbstractValidator<UpdateTenantCommand>
 {
     public UpdateTenantCommandValidator()

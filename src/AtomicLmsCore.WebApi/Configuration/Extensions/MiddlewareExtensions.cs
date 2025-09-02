@@ -19,6 +19,7 @@ public static class MiddlewareExtensions
 
         app.UseHttpsRedirection()
             .UseMiddleware<CorrelationIdMiddleware>()
+            .UseMiddleware<HealthCheckAuthenticationMiddleware>()
             .UseAuthentication()
             .UseMiddleware<TenantResolutionMiddleware>()
             .UseCors()

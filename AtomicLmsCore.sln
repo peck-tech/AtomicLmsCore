@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicLmsCore.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicLmsCore.WebApi.Tests", "tests\AtomicLmsCore.WebApi.Tests\AtomicLmsCore.WebApi.Tests.csproj", "{27212BD2-FCDB-41E9-8D1E-35F6E1A1F0FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicLmsCore.IntegrationTests", "tests\AtomicLmsCore.IntegrationTests\AtomicLmsCore.IntegrationTests.csproj", "{219ED9EF-9CC7-4554-8249-DA7639442A11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{27212BD2-FCDB-41E9-8D1E-35F6E1A1F0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27212BD2-FCDB-41E9-8D1E-35F6E1A1F0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27212BD2-FCDB-41E9-8D1E-35F6E1A1F0FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{219ED9EF-9CC7-4554-8249-DA7639442A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{219ED9EF-9CC7-4554-8249-DA7639442A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{219ED9EF-9CC7-4554-8249-DA7639442A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{219ED9EF-9CC7-4554-8249-DA7639442A11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{428677EA-29F7-4545-9809-728CCAC39E9F} = {A1DD8020-4667-4BF1-99CF-D1E87C4410EE}
@@ -74,5 +80,6 @@ Global
 		{C8D41882-E325-462B-8F62-184250B39890} = {80C40A76-999C-4CE3-9280-4B2D1BC69FD0}
 		{66534F27-0F0C-468A-8527-084802790112} = {80C40A76-999C-4CE3-9280-4B2D1BC69FD0}
 		{27212BD2-FCDB-41E9-8D1E-35F6E1A1F0FE} = {80C40A76-999C-4CE3-9280-4B2D1BC69FD0}
+		{219ED9EF-9CC7-4554-8249-DA7639442A11} = {80C40A76-999C-4CE3-9280-4B2D1BC69FD0}
 	EndGlobalSection
 EndGlobal

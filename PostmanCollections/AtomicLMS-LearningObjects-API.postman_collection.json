@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "AtomicLMS - Learning Objects API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Learning Object Management",
+      "description": "CRUD operations for learning objects",
+      "item": [
+        {
+          "name": "Create Learning Object",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "X-Tenant-Id",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/learning/learningobjects"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \u0022Name\u0022: \u0022Introduction to Programming\u0022,\n  \u0022Metadata\u0022: {\n    \u0022type\u0022: \u0022video\u0022,\n    \u0022duration\u0022: \u002245 minutes\u0022,\n    \u0022difficulty\u0022: \u0022beginner\u0022\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 201 Created\u0027, function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Returns learning object ID\u0027, function() {",
+                  "    var id = pm.response.json();",
+                  "    pm.expect(id).to.be.a(\u0027string\u0027);",
+                  "    pm.environment.set(\u0027createdLearningObjectId\u0027, id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{baseUrl}}",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "learningObjectId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

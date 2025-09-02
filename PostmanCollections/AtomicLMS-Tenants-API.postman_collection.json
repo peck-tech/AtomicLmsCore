@@ -1,0 +1,409 @@
+{
+  "info": {
+    "name": "AtomicLMS - Tenants API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication \u0026 Authorization",
+      "description": "Tests for role-based access control",
+      "item": [
+        {
+          "name": "Get All Tenants - No Auth (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Authorization",
+                "value": ""
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 401 Unauthorized\u0027, function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Tenants - Wrong Role (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "user"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 403 Forbidden\u0027, function() {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CRUD Operations",
+      "description": "Create, Read, Update, Delete operations for tenants",
+      "item": [
+        {
+          "name": "Create Tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "superadmin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \u0022Name\u0022: \u0022Test Tenant\u0022,\n  \u0022Slug\u0022: \u0022test-tenant\u0022,\n  \u0022DatabaseName\u0022: \u0022TestDatabase\u0022,\n  \u0022IsActive\u0022: true,\n  \u0022Metadata\u0022: {\n    \u0022environment\u0022: \u0022test\u0022\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 201 Created\u0027, function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Response contains tenant ID\u0027, function() {",
+                  "    var tenantId = pm.response.json();",
+                  "    pm.expect(tenantId).to.be.a(\u0027string\u0027);",
+                  "    pm.environment.set(\u0027createdTenantId\u0027, tenantId);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Has Correlation ID header\u0027, function() {",
+                  "    pm.response.to.have.header(\u0027X-Correlation-ID\u0027);",
+                  "    pm.environment.set(\u0027correlationId\u0027, pm.response.headers.get(\u0027X-Correlation-ID\u0027));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Tenants",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "superadmin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 200\u0027, function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Response is an array\u0027, function() {",
+                  "    var tenants = pm.response.json();",
+                  "    pm.expect(tenants).to.be.an(\u0027array\u0027);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Each tenant has required properties\u0027, function() {",
+                  "    var tenants = pm.response.json();",
+                  "    tenants.forEach(function(tenant) {",
+                  "        pm.expect(tenant).to.have.property(\u0027id\u0027);",
+                  "        pm.expect(tenant).to.have.property(\u0027name\u0027);",
+                  "        pm.expect(tenant).to.have.property(\u0027slug\u0027);",
+                  "        pm.expect(tenant).to.have.property(\u0027isActive\u0027);",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tenant by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "superadmin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants/{{createdTenantId}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 200\u0027, function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Tenant has correct structure\u0027, function() {",
+                  "    var tenant = pm.response.json();",
+                  "    pm.expect(tenant.id).to.equal(pm.environment.get(\u0027createdTenantId\u0027));",
+                  "    pm.expect(tenant).to.have.property(\u0027name\u0027);",
+                  "    pm.expect(tenant).to.have.property(\u0027databaseName\u0027);",
+                  "    pm.expect(tenant).to.have.property(\u0027metadata\u0027);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Tenant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "superadmin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants/{{createdTenantId}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \u0022Name\u0022: \u0022Updated Tenant Name\u0022,\n  \u0022Slug\u0022: \u0022updated-tenant\u0022,\n  \u0022IsActive\u0022: false,\n  \u0022Metadata\u0022: {\n    \u0022updated\u0022: \u0022true\u0022\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 204 No Content\u0027, function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Tenant",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "superadmin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants/{{createdTenantId}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 204 No Content\u0027, function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Validation Tests",
+      "description": "Input validation and error handling",
+      "item": [
+        {
+          "name": "Create Tenant - Invalid Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-Test-Role",
+                "value": "superadmin"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v0.1/solution/tenants"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \u0022name\u0022: \u0022\u0022,\n  \u0022slug\u0022: \u0022test\u0022,\n  \u0022databaseName\u0022: \u0022db\u0022,\n  \u0022isActive\u0022: true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\u0027Status code is 400 Bad Request\u0027, function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\u0027Error response has expected structure\u0027, function() {",
+                  "    var error = pm.response.json();",
+                  "    pm.expect(error).to.have.property(\u0027code\u0027);",
+                  "    pm.expect(error).to.have.property(\u0027message\u0027);",
+                  "    pm.expect(error).to.have.property(\u0027correlationId\u0027);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{baseUrl}}",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "learningObjectId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

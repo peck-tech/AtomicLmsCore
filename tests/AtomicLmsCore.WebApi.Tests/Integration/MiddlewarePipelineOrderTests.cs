@@ -37,7 +37,7 @@ public class MiddlewarePipelineOrderTests : IDisposable
                         app.UseMiddleware<CorrelationIdMiddleware>();
                         app.UseMiddleware<TenantResolutionMiddleware>();
 
-                        app.Use((HttpContext context, RequestDelegate next) =>
+                        app.Use((HttpContext context, RequestDelegate _) =>
                         {
                             executionOrder.Add("FinalMiddleware");
 
@@ -83,7 +83,7 @@ public class MiddlewarePipelineOrderTests : IDisposable
                 correlationIdSet = true;
                 await next(context);
             },
-            
+
             // Simulate TenantResolutionMiddleware behavior
             async (context, next) =>
             {
@@ -275,7 +275,7 @@ public class MiddlewarePipelineOrderTests : IDisposable
     {
         foreach (var host in _hosts)
         {
-            host?.Dispose();
+            host.Dispose();
         }
     }
 }

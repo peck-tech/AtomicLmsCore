@@ -9,10 +9,17 @@ builder.Services
     .AddPersistence()
     .AddApplicationServices()
     .AddJwtAuthentication(builder.Configuration)
-    .AddCorsConfiguration();
+    .AddCorsConfiguration()
+    .AddHealthCheckConfiguration(builder.Configuration);
 
 var app = builder.Build();
 
-app.ConfigureMiddleware();
+app.ConfigureMiddleware()
+    .MapHealthCheckEndpoints();
 
 app.Run();
+
+// Make Program class accessible for testing
+public partial class Program
+{
+}

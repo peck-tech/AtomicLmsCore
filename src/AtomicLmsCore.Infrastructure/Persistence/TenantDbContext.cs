@@ -38,6 +38,11 @@ public class TenantDbContext : DbContext
     /// </summary>
     public DbSet<TenantIdentity> TenantIdentity => Set<TenantIdentity>();
 
+    /// <summary>
+    ///     The Learning Objects table - tenant-specific entity.
+    /// </summary>
+    public DbSet<LearningObject> LearningObjects => Set<LearningObject>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -45,6 +50,7 @@ public class TenantDbContext : DbContext
         // Apply entity configurations
         modelBuilder.ApplyConfiguration(new UserTenantConfiguration());
         modelBuilder.ApplyConfiguration(new TenantIdentityConfiguration());
+        modelBuilder.ApplyConfiguration(new LearningObjectConfiguration());
 
         // Configure all entities inheriting from BaseEntity that belong to this context
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

@@ -82,11 +82,11 @@ public class TenantDatabaseValidatorTests : IDisposable
         {
             // Arrange
             var tenantId = Guid.NewGuid();
-            var databaseName = "test_db";
+            const string DatabaseName = "test_db";
 
             // Act - Multiple calls
-            var result1 = await _validator.ValidateTenantDatabaseAsync(tenantId, databaseName);
-            var result2 = await _validator.ValidateTenantDatabaseAsync(tenantId, databaseName);
+            _ = await _validator.ValidateTenantDatabaseAsync(tenantId, DatabaseName);
+            _ = await _validator.ValidateTenantDatabaseAsync(tenantId, DatabaseName);
 
             // Assert - Verify debug logging for cache hit
             _loggerMock.Verify(

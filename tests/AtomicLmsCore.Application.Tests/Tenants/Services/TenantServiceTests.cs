@@ -9,15 +9,14 @@ namespace AtomicLmsCore.Application.Tests.Tenants.Services;
 
 public class TenantServiceTests
 {
-    private readonly Mock<ILogger<TenantService>> _loggerMock;
     private readonly Mock<ITenantRepository> _repositoryMock;
     private readonly TenantService _service;
 
     public TenantServiceTests()
     {
         _repositoryMock = new();
-        _loggerMock = new();
-        _service = new(_repositoryMock.Object, _loggerMock.Object);
+        Mock<ILogger<TenantService>> loggerMock = new();
+        _service = new(_repositoryMock.Object, loggerMock.Object);
     }
 
     public class GetByIdAsyncTests : TenantServiceTests

@@ -69,8 +69,37 @@
 - Run fast tests on every build
 - Run slow tests in CI pipeline only
 
+## Integration Testing
+### API Integration Tests
+- Use WebApplicationFactory for full HTTP request/response testing
+- Test all API endpoints for authentication and authorization
+- Verify HTTP status codes, response bodies, and headers
+- Test error scenarios and edge cases
+- Use in-memory databases for test isolation
+
+### Integration Test Requirements
+- All API controllers must have comprehensive integration tests
+- Test happy path and error scenarios for each endpoint
+- Verify tenant isolation and multi-tenant functionality
+- Test authentication flows and role-based access
+- Include correlation ID validation in responses
+
+### Test Data Management
+- Use test-specific databases (in-memory or test containers)
+- Seed minimal test data for each test scenario
+- Clean up test data between test runs
+- Mock external dependencies and services
+
+### API Changes Policy
+- **MANDATORY**: When adding new API endpoints, create corresponding integration tests
+- **MANDATORY**: When modifying existing endpoints, update integration tests accordingly
+- **MANDATORY**: When changing authentication/authorization, verify with integration tests
+- Integration tests must cover all HTTP methods (GET, POST, PUT, DELETE)
+- Test both successful responses and error conditions
+
 ## Continuous Integration
 - Tests must pass before merging
 - Failed tests block deployment
 - Monitor test execution time trends
 - Maintain test reliability (no flaky tests)
+- Integration tests run in CI pipeline alongside unit tests

@@ -56,7 +56,7 @@ public class TenantRepositoryTests : IDisposable
             var result = await _repository.GetByIdAsync(tenant.Id);
 
             result.Should().NotBeNull();
-            result.Id.Should().Be(tenant.Id);
+            result!.Id.Should().Be(tenant.Id);
             result.Name.Should().Be(tenant.Name);
             result.Slug.Should().Be(tenant.Slug);
             result.IsActive.Should().Be(tenant.IsActive);
@@ -192,7 +192,7 @@ public class TenantRepositoryTests : IDisposable
                 .FirstOrDefaultAsync(t => t.Id == tenant.Id);
 
             deletedTenant.Should().NotBeNull();
-            deletedTenant.IsDeleted.Should().BeTrue();
+            deletedTenant!.IsDeleted.Should().BeTrue();
         }
 
         [Fact]
