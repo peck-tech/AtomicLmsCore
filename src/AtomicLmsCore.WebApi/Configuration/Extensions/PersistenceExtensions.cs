@@ -47,6 +47,7 @@ public static class PersistenceExtensions
         });
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ILearningObjectRepository, LearningObjectRepository>();
 
         return services;
     }

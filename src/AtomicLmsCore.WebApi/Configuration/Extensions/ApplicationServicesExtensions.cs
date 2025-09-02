@@ -14,6 +14,7 @@ public static class ApplicationServicesExtensions
         {
             cfg.AddProfile<TenantMappingProfile>();
             cfg.AddProfile<UserMappingProfile>();
+            cfg.AddProfile<LearningObjectMappingProfile>();
         });
 
         services.AddMediatR(cfg =>

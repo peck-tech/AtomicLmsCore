@@ -117,7 +117,7 @@ public class TenantServiceTests
         [Fact]
         public async Task CreateAsync_WithNullName_ReturnsFailure()
         {
-            var result = await _service.CreateAsync(null);
+            var result = await _service.CreateAsync(null!);
 
             result.IsFailed.Should().BeTrue();
             result.Errors.Should().ContainSingle(e => e.Message == "Tenant name is required");
@@ -183,7 +183,7 @@ public class TenantServiceTests
         {
             var tenantId = Guid.NewGuid();
 
-            var result = await _service.UpdateAsync(tenantId, null);
+            var result = await _service.UpdateAsync(tenantId, null!);
 
             result.IsFailed.Should().BeTrue();
             result.Errors.Should().ContainSingle(e => e.Message == "Tenant name is required");
@@ -194,7 +194,7 @@ public class TenantServiceTests
         {
             var tenantId = Guid.NewGuid();
             _repositoryMock.Setup(r => r.GetByIdAsync(tenantId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Tenant)null);
+                .ReturnsAsync((Tenant)null!);
 
             var result = await _service.UpdateAsync(tenantId, "Updated Name");
 

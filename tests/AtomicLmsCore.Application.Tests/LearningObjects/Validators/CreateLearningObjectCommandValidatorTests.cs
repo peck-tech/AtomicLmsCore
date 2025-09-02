@@ -1,6 +1,7 @@
 using AtomicLmsCore.Application.LearningObjects.Commands;
 using AtomicLmsCore.Application.LearningObjects.Validators;
 using FluentValidation.TestHelper;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace AtomicLmsCore.Application.Tests.LearningObjects.Validators;
 

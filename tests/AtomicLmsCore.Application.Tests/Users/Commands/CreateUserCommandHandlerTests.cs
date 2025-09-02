@@ -13,19 +13,18 @@ public class CreateUserCommandHandlerTests
 {
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IIdGenerator> _idGeneratorMock;
-    private readonly Mock<ILogger<CreateUserCommandHandler>> _loggerMock;
     private readonly CreateUserCommandHandler _handler;
 
     public CreateUserCommandHandlerTests()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _idGeneratorMock = new Mock<IIdGenerator>();
-        _loggerMock = new Mock<ILogger<CreateUserCommandHandler>>();
+        var loggerMock = new Mock<ILogger<CreateUserCommandHandler>>();
 
         _handler = new CreateUserCommandHandler(
             _userRepositoryMock.Object,
             _idGeneratorMock.Object,
-            _loggerMock.Object);
+            loggerMock.Object);
     }
 
     public class HandleTests : CreateUserCommandHandlerTests

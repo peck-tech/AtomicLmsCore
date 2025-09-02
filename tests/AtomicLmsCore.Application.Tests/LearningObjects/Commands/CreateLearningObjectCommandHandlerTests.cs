@@ -4,6 +4,7 @@ using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using FluentAssertions;
 using Moq;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace AtomicLmsCore.Application.Tests.LearningObjects.Commands;
 

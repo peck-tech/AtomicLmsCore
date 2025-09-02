@@ -14,7 +14,6 @@ public class UserRepositoryTests : IDisposable
 {
     private readonly TenantDbContext _context;
     private readonly UserRepository _repository;
-    private readonly Mock<ILogger<UserRepository>> _loggerMock;
     private readonly IIdGenerator _idGenerator;
 
     public UserRepositoryTests()
@@ -25,14 +24,12 @@ public class UserRepositoryTests : IDisposable
 
         _idGenerator = new UlidIdGenerator();
         _context = new TenantDbContext(options, _idGenerator);
-        _loggerMock = new Mock<ILogger<UserRepository>>();
-        _repository = new UserRepository(_context, _loggerMock.Object);
+        var loggerMock = new Mock<ILogger<UserRepository>>();
+        _repository = new UserRepository(_context, loggerMock.Object);
     }
 
     public void Dispose()
-    {
-        _context.Dispose();
-    }
+        => _context.Dispose();
 
     public class GetAllAsyncTests : UserRepositoryTests
     {

@@ -5,7 +5,6 @@ using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.Infrastructure.Persistence.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AtomicLmsCore.Infrastructure.Tests.Persistence.Repositories;
@@ -13,8 +12,6 @@ namespace AtomicLmsCore.Infrastructure.Tests.Persistence.Repositories;
 public class TenantRepositoryTests : IDisposable
 {
     private readonly SolutionsDbContext _context;
-    private readonly Mock<IIdGenerator> _idGeneratorMock;
-    private readonly Mock<ILogger<TenantRepository>> _loggerMock;
     private readonly TenantRepository _repository;
 
     public TenantRepositoryTests()
@@ -23,17 +20,16 @@ public class TenantRepositoryTests : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
-        _idGeneratorMock = new();
-        _idGeneratorMock.Setup(x => x.NewId()).Returns(() => Guid.NewGuid());
+        Mock<IIdGenerator> idGeneratorMock = new();
+        idGeneratorMock.Setup(x => x.NewId()).Returns(() => Guid.NewGuid());
 
-        _context = new(options, _idGeneratorMock.Object);
-        _loggerMock = new();
+        _context = new(options, idGeneratorMock.Object);
         _repository = new(_context);
     }
 
     public void Dispose() => _context.Dispose();
 
-    protected static Tenant CreateTestTenant(string name, string? slug = null, int? internalId = null) =>
+    private static Tenant CreateTestTenant(string name, string? slug = null, int? internalId = null) =>
         new()
         {
             Id = Guid.NewGuid(),

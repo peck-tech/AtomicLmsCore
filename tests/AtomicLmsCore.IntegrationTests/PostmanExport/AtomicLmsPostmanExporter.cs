@@ -1,6 +1,7 @@
 using AtomicLmsCore.WebApi.DTOs.LearningObjects;
 using AtomicLmsCore.WebApi.DTOs.Tenants;
 using AtomicLmsCore.WebApi.DTOs.Users;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace AtomicLmsCore.IntegrationTests.PostmanExport;
 
@@ -23,6 +24,7 @@ public class AtomicLmsPostmanExporter
 
     private static async Task ExportTenantsCollection(string filePath)
     {
+        // ReSharper disable once RedundantArgumentDefaultValue
         var generator = new PostmanCollectionGenerator("AtomicLMS - Tenants API", "{{baseUrl}}");
 
         // Authentication Tests Folder

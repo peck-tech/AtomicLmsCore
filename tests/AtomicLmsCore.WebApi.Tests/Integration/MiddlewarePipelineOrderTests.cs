@@ -14,7 +14,7 @@ namespace AtomicLmsCore.WebApi.Tests.Integration;
 
 public class MiddlewarePipelineOrderTests : IDisposable
 {
-    private readonly List<IHost> _hosts = new();
+    private readonly List<IHost> _hosts = [];
 
     [Fact]
     public async Task MiddlewarePipeline_CorrelationIdSetBeforeTenantResolution()
@@ -233,9 +233,17 @@ public class MiddlewarePipelineOrderTests : IDisposable
 
     private static HttpContext CreateTestContext(string path)
     {
-        var context = new DefaultHttpContext();
-        context.Request.Path = path;
-        context.Response.Body = new MemoryStream();
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Path = path
+            },
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
         return context;
     }
 
@@ -243,8 +251,7 @@ public class MiddlewarePipelineOrderTests : IDisposable
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, "test-user"),
-            new(ClaimTypes.Name, "Test User")
+            new(ClaimTypes.NameIdentifier, "test-user"), new(ClaimTypes.Name, "Test User")
         };
 
         if (tenantClaims != null)

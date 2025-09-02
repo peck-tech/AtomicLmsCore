@@ -10,14 +10,13 @@ namespace AtomicLmsCore.WebApi.Tests.Middleware;
 public class TenantResolutionMiddlewareTests
 {
     private readonly Mock<RequestDelegate> _nextMock;
-    private readonly Mock<ILogger<TenantResolutionMiddleware>> _loggerMock;
     private readonly TenantResolutionMiddleware _middleware;
 
     public TenantResolutionMiddlewareTests()
     {
         _nextMock = new Mock<RequestDelegate>();
-        _loggerMock = new Mock<ILogger<TenantResolutionMiddleware>>();
-        _middleware = new TenantResolutionMiddleware(_nextMock.Object, _loggerMock.Object);
+        var loggerMock = new Mock<ILogger<TenantResolutionMiddleware>>();
+        _middleware = new TenantResolutionMiddleware(_nextMock.Object, loggerMock.Object);
     }
 
     [Theory]
@@ -282,12 +281,23 @@ public class TenantResolutionMiddlewareTests
         context.Items["ValidatedTenantId"].Should().Be(tenantId);
     }
 
-    private static HttpContext CreateHttpContext(string path)
+    private static DefaultHttpContext CreateHttpContext(string path)
     {
-        var context = new DefaultHttpContext();
-        context.Request.Path = path;
-        context.Response.Body = new MemoryStream();
-        context.Items["CorrelationId"] = Guid.NewGuid().ToString();
+        var context = new DefaultHttpContext
+        {
+            Request =
+            {
+                Path = path
+            },
+            Response =
+            {
+                Body = new MemoryStream()
+            },
+            Items =
+            {
+                ["CorrelationId"] = Guid.NewGuid().ToString()
+            }
+        };
         return context;
     }
 

@@ -43,7 +43,7 @@ public class IntegrationTestWebApplicationFactory<TProgram> : WebApplicationFact
             }
 
             // Register in-memory database contexts for testing
-            services.AddSingleton(_ =>
+            services.AddScoped(_ =>
             {
                 var options = new DbContextOptionsBuilder<SolutionsDbContext>()
                     .UseInMemoryDatabase("TestSolutionsDb")

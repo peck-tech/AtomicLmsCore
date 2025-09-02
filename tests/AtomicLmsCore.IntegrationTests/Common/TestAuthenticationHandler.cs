@@ -13,6 +13,17 @@ public class TestAuthenticationHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        // Check if this is a test that should be unauthenticated
+        // If no test-specific headers are present, fail authentication
+        var hasTestRole = Context.Request.Headers.ContainsKey("X-Test-Role");
+        var hasTestTenant = Context.Request.Headers.ContainsKey("X-Test-Tenant");
+        var hasTestAuth = Context.Request.Headers.ContainsKey("X-Test-Auth");
+
+        if (!hasTestRole && !hasTestTenant && !hasTestAuth)
+        {
+            return Task.FromResult(AuthenticateResult.Fail("No test authentication headers provided"));
+        }
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, "Test User"),

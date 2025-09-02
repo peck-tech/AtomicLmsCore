@@ -19,7 +19,7 @@ public class ValidationBehavior<TRequest, TResponse>(
     {
         if (!validators.Any())
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
         var context = new ValidationContext<TRequest>(request);
@@ -43,6 +43,21 @@ public class ValidationBehavior<TRequest, TResponse>(
             requestName,
             string.Join(", ", errors));
 
-        return (TResponse)(object)Result.Fail(errors);
+        // Check if TResponse is a generic Result<T> type
+        var responseType = typeof(TResponse);
+        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
+        {
+            return (TResponse)(object)Result.Fail(errors);
+        }
+        var valueType = responseType.GetGenericArguments()[0];
+        // Use the specific generic Result.Fail<T> method
+        var failMethod = typeof(Result)
+            .GetMethods()
+            .Where(m => m.Name == nameof(Result.Fail) && m.IsGenericMethodDefinition)
+            .First(m => m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(IEnumerable<string>))
+            .MakeGenericMethod(valueType);
+        return (TResponse)failMethod.Invoke(
+            null,
+            [errors])!;
     }
 }

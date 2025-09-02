@@ -9,14 +9,13 @@ namespace AtomicLmsCore.WebApi.Tests.Middleware;
 public class CorrelationIdMiddlewareTests
 {
     private readonly Mock<RequestDelegate> _nextMock;
-    private readonly Mock<ILogger<CorrelationIdMiddleware>> _loggerMock;
     private readonly CorrelationIdMiddleware _middleware;
 
     public CorrelationIdMiddlewareTests()
     {
         _nextMock = new Mock<RequestDelegate>();
-        _loggerMock = new Mock<ILogger<CorrelationIdMiddleware>>();
-        _middleware = new CorrelationIdMiddleware(_nextMock.Object, _loggerMock.Object);
+        var loggerMock = new Mock<ILogger<CorrelationIdMiddleware>>();
+        _middleware = new CorrelationIdMiddleware(_nextMock.Object, loggerMock.Object);
     }
 
     [Fact]
@@ -167,8 +166,13 @@ public class CorrelationIdMiddlewareTests
 
     private static HttpContext CreateHttpContext()
     {
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
         return context;
     }
 }
