@@ -1,11 +1,13 @@
 using AtomicLmsCore.Application.LearningObjects.Commands;
 using FluentValidation;
+using JetBrains.Annotations;
 
 namespace AtomicLmsCore.Application.LearningObjects.Validators;
 
 /// <summary>
 ///     Validator for UpdateLearningObjectCommand.
 /// </summary>
+[UsedImplicitly]
 public class UpdateLearningObjectCommandValidator : AbstractValidator<UpdateLearningObjectCommand>
 {
     public UpdateLearningObjectCommandValidator()

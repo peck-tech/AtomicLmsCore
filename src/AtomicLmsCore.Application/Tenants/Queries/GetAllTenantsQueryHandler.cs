@@ -1,6 +1,7 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.Tenants.Queries;
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Application.Tenants.Queries;
 /// <summary>
 ///     Handler for GetAllTenantsQuery.
 /// </summary>
+[UsedImplicitly]
 public class GetAllTenantsQueryHandler(ITenantRepository tenantRepository)
     : IRequestHandler<GetAllTenantsQuery, Result<IEnumerable<Tenant>>>
 {

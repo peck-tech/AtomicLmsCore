@@ -1,10 +1,12 @@
 using System.Diagnostics;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging;
 
 namespace AtomicLmsCore.Application.Common.Behaviors;
 
+[UsedImplicitly]
 public class TelemetryBehavior<TRequest, TResponse>(
     TelemetryClient telemetryClient,
     ILogger<TelemetryBehavior<TRequest, TResponse>> logger)

@@ -1,5 +1,6 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Application.Users.Commands;
 /// <summary>
 ///     Handler for deleting a user (soft delete).
 /// </summary>
+[UsedImplicitly]
 public class DeleteUserCommandHandler(
     IUserRepository userRepository,
     ILogger<DeleteUserCommandHandler> logger)

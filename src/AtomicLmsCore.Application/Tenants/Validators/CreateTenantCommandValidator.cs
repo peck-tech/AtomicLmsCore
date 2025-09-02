@@ -1,11 +1,13 @@
 using AtomicLmsCore.Application.Tenants.Commands;
 using FluentValidation;
+using JetBrains.Annotations;
 
 namespace AtomicLmsCore.Application.Tenants.Validators;
 
 /// <summary>
 ///     Validator for CreateTenantCommand.
 /// </summary>
+[UsedImplicitly]
 public class CreateTenantCommandValidator : AbstractValidator<CreateTenantCommand>
 {
     public CreateTenantCommandValidator()

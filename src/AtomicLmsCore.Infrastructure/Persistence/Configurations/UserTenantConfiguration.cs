@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AtomicLmsCore.Domain.Entities;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +11,7 @@ namespace AtomicLmsCore.Infrastructure.Persistence.Configurations;
 ///     Entity configuration for User in the tenant-specific database.
 ///     No tenant relationship since each database is tenant-specific.
 /// </summary>
+[UsedImplicitly]
 public class UserTenantConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)

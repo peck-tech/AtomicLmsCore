@@ -1,5 +1,6 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Application.Users.Commands;
 /// <summary>
 ///     Handler for updating an existing user.
 /// </summary>
+[UsedImplicitly]
 public class UpdateUserCommandHandler(
     IUserRepository userRepository,
     ILogger<UpdateUserCommandHandler> logger)

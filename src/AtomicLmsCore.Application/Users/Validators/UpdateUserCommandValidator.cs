@@ -1,11 +1,13 @@
 using AtomicLmsCore.Application.Users.Commands;
 using FluentValidation;
+using JetBrains.Annotations;
 
 namespace AtomicLmsCore.Application.Users.Validators;
 
 /// <summary>
 ///     Validator for UpdateUserCommand.
 /// </summary>
+[UsedImplicitly]
 public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
     public UpdateUserCommandValidator()

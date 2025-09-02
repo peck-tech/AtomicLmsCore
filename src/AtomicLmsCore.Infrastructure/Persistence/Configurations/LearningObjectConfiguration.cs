@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AtomicLmsCore.Domain.Entities;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,6 +10,7 @@ namespace AtomicLmsCore.Infrastructure.Persistence.Configurations;
 /// <summary>
 ///     Entity configuration for LearningObject in the tenant-specific database.
 /// </summary>
+[UsedImplicitly]
 public class LearningObjectConfiguration : IEntityTypeConfiguration<LearningObject>
 {
     public void Configure(EntityTypeBuilder<LearningObject> builder)

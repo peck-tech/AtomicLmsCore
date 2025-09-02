@@ -2,6 +2,7 @@ using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -10,6 +11,7 @@ namespace AtomicLmsCore.Application.Users.Commands;
 /// <summary>
 ///     Handler for creating a new user.
 /// </summary>
+[UsedImplicitly]
 public class CreateUserCommandHandler(
     IUserRepository userRepository,
     IIdGenerator idGenerator,

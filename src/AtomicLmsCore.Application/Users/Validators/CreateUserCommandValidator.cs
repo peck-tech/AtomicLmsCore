@@ -1,11 +1,13 @@
 using AtomicLmsCore.Application.Users.Commands;
 using FluentValidation;
+using JetBrains.Annotations;
 
 namespace AtomicLmsCore.Application.Users.Validators;
 
 /// <summary>
 ///     Validator for CreateUserCommand.
 /// </summary>
+[UsedImplicitly]
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator()

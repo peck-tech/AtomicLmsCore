@@ -1,10 +1,12 @@
 using FluentResults;
 using FluentValidation;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace AtomicLmsCore.Application.Common.Behaviors;
 
+[UsedImplicitly]
 public class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators,
     ILogger<ValidationBehavior<TRequest, TResponse>> logger)

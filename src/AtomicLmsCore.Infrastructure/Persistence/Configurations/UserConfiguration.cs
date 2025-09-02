@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AtomicLmsCore.Domain.Entities;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Infrastructure.Persistence.Configurations;
 /// <summary>
 ///     Entity Framework configuration for the User entity.
 /// </summary>
+[UsedImplicitly]
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)

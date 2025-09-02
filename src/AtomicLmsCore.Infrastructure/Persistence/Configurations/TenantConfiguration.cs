@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AtomicLmsCore.Domain.Entities;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Infrastructure.Persistence.Configurations;
 /// <summary>
 ///     Entity Framework configuration for the Tenant entity.
 /// </summary>
+[UsedImplicitly]
 public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 {
     public void Configure(EntityTypeBuilder<Tenant> builder)

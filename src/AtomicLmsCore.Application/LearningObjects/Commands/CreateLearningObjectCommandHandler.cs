@@ -2,6 +2,7 @@ using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.LearningObjects.Commands;
@@ -9,6 +10,7 @@ namespace AtomicLmsCore.Application.LearningObjects.Commands;
 /// <summary>
 ///     Handler for CreateLearningObjectCommand.
 /// </summary>
+[UsedImplicitly]
 public class CreateLearningObjectCommandHandler(
     ILearningObjectRepository learningObjectRepository,
     IIdGenerator idGenerator)

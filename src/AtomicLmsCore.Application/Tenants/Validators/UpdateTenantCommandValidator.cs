@@ -1,11 +1,13 @@
 using AtomicLmsCore.Application.Tenants.Commands;
 using FluentValidation;
+using JetBrains.Annotations;
 
 namespace AtomicLmsCore.Application.Tenants.Validators;
 
 /// <summary>
 ///     Validator for UpdateTenantCommand.
 /// </summary>
+[UsedImplicitly]
 public class UpdateTenantCommandValidator : AbstractValidator<UpdateTenantCommand>
 {
     public UpdateTenantCommandValidator()

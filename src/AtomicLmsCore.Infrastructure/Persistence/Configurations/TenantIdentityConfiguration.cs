@@ -1,4 +1,5 @@
 using AtomicLmsCore.Domain.Entities;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Infrastructure.Persistence.Configurations;
 ///     Entity Framework configuration for the TenantIdentity entity.
 ///     This entity exists only in tenant-specific databases for validation.
 /// </summary>
+[UsedImplicitly]
 public class TenantIdentityConfiguration : IEntityTypeConfiguration<TenantIdentity>
 {
     public void Configure(EntityTypeBuilder<TenantIdentity> builder)

@@ -1,6 +1,7 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -9,6 +10,7 @@ namespace AtomicLmsCore.Application.Users.Queries;
 /// <summary>
 ///     Handler for getting all users in the current tenant database.
 /// </summary>
+[UsedImplicitly]
 public class GetAllUsersQueryHandler(
     IUserRepository userRepository,
     ILogger<GetAllUsersQueryHandler> logger)

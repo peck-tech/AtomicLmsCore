@@ -1,6 +1,7 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.LearningObjects.Queries;
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Application.LearningObjects.Queries;
 /// <summary>
 ///     Handler for GetLearningObjectByIdQuery.
 /// </summary>
+[UsedImplicitly]
 public class GetLearningObjectByIdQueryHandler(ILearningObjectRepository learningObjectRepository)
     : IRequestHandler<GetLearningObjectByIdQuery, Result<LearningObject>>
 {

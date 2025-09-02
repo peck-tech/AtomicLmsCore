@@ -2,6 +2,7 @@ using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Domain.Services;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.Tenants.Commands;
@@ -9,6 +10,7 @@ namespace AtomicLmsCore.Application.Tenants.Commands;
 /// <summary>
 ///     Handler for CreateTenantCommand.
 /// </summary>
+[UsedImplicitly]
 public class CreateTenantCommandHandler(ITenantRepository tenantRepository, IIdGenerator idGenerator)
     : IRequestHandler<CreateTenantCommand, Result<Guid>>
 {

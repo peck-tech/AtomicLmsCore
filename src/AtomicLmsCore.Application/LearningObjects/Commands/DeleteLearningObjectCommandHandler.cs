@@ -1,5 +1,6 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.LearningObjects.Commands;
@@ -7,6 +8,7 @@ namespace AtomicLmsCore.Application.LearningObjects.Commands;
 /// <summary>
 ///     Handler for DeleteLearningObjectCommand.
 /// </summary>
+[UsedImplicitly]
 public class DeleteLearningObjectCommandHandler(ILearningObjectRepository learningObjectRepository)
     : IRequestHandler<DeleteLearningObjectCommand, Result>
 {

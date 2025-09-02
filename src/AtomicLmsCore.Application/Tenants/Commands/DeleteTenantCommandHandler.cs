@@ -1,5 +1,6 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.Tenants.Commands;
@@ -7,6 +8,7 @@ namespace AtomicLmsCore.Application.Tenants.Commands;
 /// <summary>
 ///     Handler for DeleteTenantCommand.
 /// </summary>
+[UsedImplicitly]
 public class DeleteTenantCommandHandler(ITenantRepository tenantRepository)
     : IRequestHandler<DeleteTenantCommand, Result>
 {

@@ -1,6 +1,7 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 
 namespace AtomicLmsCore.Application.LearningObjects.Queries;
@@ -8,6 +9,7 @@ namespace AtomicLmsCore.Application.LearningObjects.Queries;
 /// <summary>
 ///     Handler for GetAllLearningObjectsQuery.
 /// </summary>
+[UsedImplicitly]
 public class GetAllLearningObjectsQueryHandler(ILearningObjectRepository learningObjectRepository)
     : IRequestHandler<GetAllLearningObjectsQuery, Result<List<LearningObject>>>
 {

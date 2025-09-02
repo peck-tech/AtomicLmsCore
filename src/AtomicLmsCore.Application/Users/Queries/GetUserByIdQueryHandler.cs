@@ -1,6 +1,7 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -9,6 +10,7 @@ namespace AtomicLmsCore.Application.Users.Queries;
 /// <summary>
 ///     Handler for getting a user by their unique identifier.
 /// </summary>
+[UsedImplicitly]
 public class GetUserByIdQueryHandler(
     IUserRepository userRepository,
     ILogger<GetUserByIdQueryHandler> logger)
