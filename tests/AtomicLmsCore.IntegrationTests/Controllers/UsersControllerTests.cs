@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.IntegrationTests.Common;
@@ -313,6 +314,7 @@ public class UsersControllerTests(IntegrationTestWebApplicationFactory<Program> 
     public async Task Delete_NonExistingUser_ShouldReturnNotFound()
     {
         // Arrange
+        SetTestUserPermissions(Permissions.Users.Delete);
         SetTestUserTenant(TestTenantId);
         SetTenantHeader(TestTenantId);
         var nonExistingId = Guid.NewGuid();

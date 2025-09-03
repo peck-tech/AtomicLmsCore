@@ -21,6 +21,7 @@ public static class ApplicationServicesExtensions
         {
             cfg.RegisterServicesFromAssembly(typeof(GetTenantByIdQuery).Assembly)
                 .AddOpenBehavior(typeof(ValidationBehavior<,>))
+                .AddOpenBehavior(typeof(UserContextLoggingBehavior<,>))
                 .AddOpenBehavior(typeof(TelemetryBehavior<,>));
         });
 

@@ -37,6 +37,61 @@ public static class AuthenticationExtensions
                                 return Task.CompletedTask;
                             }
 
+                            // Preserve grant type claim for determining auth flow type
+                            var grantTypeClaim = claimsIdentity.Claims
+                                .FirstOrDefault(c => c.Type == "gty" || c.Type.EndsWith("/gty"));
+                            if (grantTypeClaim != null && grantTypeClaim.Type != "gty")
+                            {
+                                claimsIdentity.AddClaim(new Claim("gty", grantTypeClaim.Value));
+                            }
+
+                            // Preserve azp (authorized party) claim for machine clients
+                            var azpClaim = claimsIdentity.Claims
+                                .FirstOrDefault(c => c.Type == "azp" || c.Type.EndsWith("/azp"));
+                            if (azpClaim != null && azpClaim.Type != "azp")
+                            {
+                                claimsIdentity.AddClaim(new Claim("azp", azpClaim.Value));
+                            }
+
+                            // Process scope claims for machine authentication
+                            var scopeClaims = claimsIdentity.Claims
+                                .Where(c => c.Type == "scope" ||
+                                           c.Type.EndsWith("/scope") ||
+                                           c.Type == $"{jwtOptions.Audience}/scope")
+                                .ToList();
+
+                            foreach (var claim in scopeClaims.Where(claim => claim.Type != "scope"))
+                            {
+                                claimsIdentity.AddClaim(new Claim("scope", claim.Value));
+                            }
+
+                            // Normalize permission claims from custom namespaces
+                            var permissionClaims = claimsIdentity.Claims
+                                .Where(c => c.Type.Contains("permissions", StringComparison.OrdinalIgnoreCase) ||
+                                           c.Type.EndsWith("/permissions", StringComparison.OrdinalIgnoreCase) ||
+                                           c.Type == $"{jwtOptions.Audience}/permissions")
+                                .ToList();
+
+                            foreach (var claim in permissionClaims.Where(claim => claim.Type != "permission"))
+                            {
+                                // Handle both single permissions and arrays
+                                if (claim.Value.StartsWith('[') && claim.Value.EndsWith(']'))
+                                {
+                                    var permissions = System.Text.Json.JsonSerializer.Deserialize<string[]>(claim.Value);
+                                    if (permissions != null)
+                                    {
+                                        foreach (var permission in permissions)
+                                        {
+                                            claimsIdentity.AddClaim(new Claim("permission", permission));
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    claimsIdentity.AddClaim(new Claim("permission", claim.Value));
+                                }
+                            }
+
                             var customTenantClaims = claimsIdentity.Claims
                                 .Where(c => c.Type.Contains("tenant_id", StringComparison.OrdinalIgnoreCase) ||
                                             c.Type.EndsWith("/tenant_id", StringComparison.OrdinalIgnoreCase) ||
@@ -80,7 +135,9 @@ public static class AuthenticationExtensions
                 });
         }
 
-        services.AddAuthorization();
+        services
+            .AddAuthorization()
+            .AddPermissionAuthorization();
 
         return services;
     }

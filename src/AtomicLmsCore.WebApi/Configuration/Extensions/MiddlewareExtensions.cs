@@ -1,3 +1,4 @@
+using AtomicLmsCore.WebApi.Authorization;
 using AtomicLmsCore.WebApi.Middleware;
 
 namespace AtomicLmsCore.WebApi.Configuration.Extensions;
@@ -21,9 +22,11 @@ public static class MiddlewareExtensions
             .UseMiddleware<CorrelationIdMiddleware>()
             .UseMiddleware<HealthCheckAuthenticationMiddleware>()
             .UseAuthentication()
+            .UseMiddleware<UserResolutionMiddleware>()
             .UseMiddleware<TenantResolutionMiddleware>()
             .UseCors()
-            .UseAuthorization();
+            .UseAuthorization()
+            .UseMiddleware<PermissionAuthorizationMiddleware>();
         app.MapControllers();
 
         return app;

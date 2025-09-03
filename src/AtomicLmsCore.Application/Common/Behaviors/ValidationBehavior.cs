@@ -34,7 +34,7 @@ public class ValidationBehavior<TRequest, TResponse>(
 
         if (failures.Count == 0)
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
         var errors = failures.Select(failure => failure.ErrorMessage).ToList();

@@ -1,5 +1,7 @@
+using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Application.Tenants.Commands;
 using AtomicLmsCore.Application.Tenants.Queries;
+using AtomicLmsCore.WebApi.Authorization;
 using AtomicLmsCore.WebApi.Common;
 using AtomicLmsCore.WebApi.DTOs.Tenants;
 using AutoMapper;
@@ -11,20 +13,23 @@ namespace AtomicLmsCore.WebApi.Controllers.Solution;
 
 /// <summary>
 ///     Controller for managing tenants in the Solution feature bucket.
-///     Requires superadmin role for all operations.
+///     Uses unified permission-based authorization supporting both user roles and machine scopes.
 /// </summary>
 [ApiController]
 [ApiVersion("0.1")]
 [Route(FeatureBucketPaths.SolutionRoute)]
-[Authorize(Roles = "superadmin")]
+[Authorize]
 public class TenantsController(IMediator mediator, ILogger<TenantsController> logger, IMapper mapper) : ControllerBase
 {
     /// <summary>
     ///     Gets all tenants.
+    ///     Requires 'tenants:read' permission.
     /// </summary>
     /// <returns>List of all tenants.</returns>
     [HttpGet]
+    [RequirePermission(Permissions.Tenants.Read)]
     [ProducesResponseType(typeof(IEnumerable<TenantListDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
@@ -56,11 +61,14 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
 
     /// <summary>
     ///     Gets a tenant by its unique identifier.
+    ///     Requires 'tenants:read' permission.
     /// </summary>
     /// <param name="id">The unique identifier of the tenant.</param>
     /// <returns>The tenant information.</returns>
     [HttpGet("{id:guid}")]
+    [RequirePermission(Permissions.Tenants.Read)]
     [ProducesResponseType(typeof(TenantDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetById(Guid id)
@@ -101,12 +109,15 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
 
     /// <summary>
     ///     Creates a new tenant.
+    ///     Requires 'tenants:create' permission.
     /// </summary>
     /// <param name="request">The tenant creation request.</param>
     /// <returns>The created tenant's ID.</returns>
     [HttpPost]
+    [RequirePermission(Permissions.Tenants.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] CreateTenantRequestDto request)
     {
@@ -151,13 +162,16 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
 
     /// <summary>
     ///     Updates an existing tenant.
+    ///     Requires 'tenants:update' permission.
     /// </summary>
     /// <param name="id">The unique identifier of the tenant to update.</param>
     /// <param name="request">The tenant update request.</param>
     /// <returns>No content on success.</returns>
     [HttpPut("{id:guid}")]
+    [RequirePermission(Permissions.Tenants.Update)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTenantRequestDto request)
@@ -205,11 +219,14 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
 
     /// <summary>
     ///     Deletes (soft delete) an existing tenant.
+    ///     Requires 'tenants:delete' permission.
     /// </summary>
     /// <param name="id">The unique identifier of the tenant to delete.</param>
     /// <returns>No content on success.</returns>
     [HttpDelete("{id:guid}")]
+    [RequirePermission(Permissions.Tenants.Delete)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id)

@@ -16,10 +16,11 @@ public class TestAuthenticationHandler(
         // Check if this is a test that should be unauthenticated
         // If no test-specific headers are present, fail authentication
         var hasTestRole = Context.Request.Headers.ContainsKey("X-Test-Role");
+        var hasTestPermissions = Context.Request.Headers.ContainsKey("X-Test-Permissions");
         var hasTestTenant = Context.Request.Headers.ContainsKey("X-Test-Tenant");
         var hasTestAuth = Context.Request.Headers.ContainsKey("X-Test-Auth");
 
-        if (!hasTestRole && !hasTestTenant && !hasTestAuth)
+        if (!hasTestRole && !hasTestPermissions && !hasTestTenant && !hasTestAuth)
         {
             return Task.FromResult(AuthenticateResult.Fail("No test authentication headers provided"));
         }
@@ -35,6 +36,12 @@ public class TestAuthenticationHandler(
         {
             var roles = roleValue.ToString().Split(',');
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.Trim())));
+        }
+
+        if (Context.Request.Headers.TryGetValue("X-Test-Permissions", out var permissionValue))
+        {
+            var permissions = permissionValue.ToString().Split(',');
+            claims.AddRange(permissions.Select(permission => new Claim("permission", permission.Trim())));
         }
 
         if (Context.Request.Headers.TryGetValue("X-Test-Tenant", out var tenantValue))

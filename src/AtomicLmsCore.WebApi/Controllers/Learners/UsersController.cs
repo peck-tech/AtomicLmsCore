@@ -1,3 +1,4 @@
+using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Application.Users.Commands;
 using AtomicLmsCore.Application.Users.Queries;
 using AtomicLmsCore.WebApi.Common;
@@ -12,19 +13,22 @@ namespace AtomicLmsCore.WebApi.Controllers.Learners;
 /// <summary>
 ///     Controller for managing users in the Learners feature bucket.
 ///     Uses tenant-specific database based on X-Tenant-Id header.
+///     Supports both user authentication (Authorization Code with PKCE) and machine authentication (Client Credentials).
 /// </summary>
 [ApiController]
 [ApiVersion("0.1")]
 [Route("api/v{version:apiVersion}/learners/[controller]")]
 [Authorize]
-public class UsersController(IMediator mediator, ILogger<UsersController> logger, IMapper mapper) : ControllerBase
+public class UsersController(IMediator mediator, ILogger<UsersController> logger, IMapper mapper, IPermissionService permissionService) : ControllerBase
 {
     /// <summary>
     ///     Gets all users in the tenant database.
+    ///     For machine authentication: requires X-On-Behalf-Of header.
     /// </summary>
     /// <returns>List of all users in the tenant.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<UserListDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
@@ -56,11 +60,13 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
 
     /// <summary>
     ///     Gets a user by their unique identifier.
+    ///     For machine authentication: requires X-On-Behalf-Of header.
     /// </summary>
     /// <param name="id">The unique identifier of the user.</param>
     /// <returns>The user information.</returns>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetById(Guid id)
@@ -101,6 +107,7 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
 
     /// <summary>
     ///     Creates a new user in the tenant database (requires existing Auth0 user).
+    ///     For machine authentication: requires X-On-Behalf-Of header.
     /// </summary>
     /// <param name="request">The user creation request.</param>
     /// <returns>The created user's ID.</returns>
@@ -153,6 +160,7 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
 
     /// <summary>
     ///     Creates a new user with password in both Auth0 and the tenant database.
+    ///     For machine authentication: requires X-On-Behalf-Of header.
     /// </summary>
     /// <param name="request">The user creation request with password.</param>
     /// <returns>The created user's ID.</returns>
@@ -205,6 +213,7 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
 
     /// <summary>
     ///     Updates an existing user.
+    ///     For machine authentication: requires X-On-Behalf-Of header.
     /// </summary>
     /// <param name="id">The unique identifier of the user to update.</param>
     /// <param name="request">The user update request.</param>
@@ -261,17 +270,35 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
 
     /// <summary>
     ///     Deletes (soft delete) an existing user.
+    ///     Requires 'users:delete' permission.
+    ///     For machine authentication: requires X-On-Behalf-Of header.
     /// </summary>
     /// <param name="id">The unique identifier of the user to delete.</param>
     /// <returns>No content on success.</returns>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(Guid id)
     {
         try
         {
+            if (!await permissionService.HasPermissionAsync(Permissions.Users.Delete))
+            {
+                var validationResult = await permissionService.ValidatePermissionAsync(Permissions.Users.Delete);
+                logger.LogWarning(
+                    "Access denied to Delete user {UserId}: {Errors}",
+                    id,
+                    string.Join(", ", validationResult.Errors.Select(e => e.Message)));
+
+                var forbiddenResponse = ErrorResponseDto.ForbiddenError(
+                    "Insufficient permissions to delete user",
+                    HttpContext.Items["CorrelationId"]?.ToString());
+                return StatusCode(StatusCodes.Status403Forbidden, forbiddenResponse);
+            }
+
             var command = new DeleteUserCommand(id);
             var result = await mediator.Send(command);
 

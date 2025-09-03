@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
 using AtomicLmsCore.Infrastructure.Persistence;
 using AtomicLmsCore.IntegrationTests.Common;
@@ -14,9 +15,9 @@ namespace AtomicLmsCore.IntegrationTests.Controllers;
 public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program> factory) : IntegrationTestBase(factory)
 {
     [Fact]
-    public async Task GetAll_WithoutSuperAdminRole_ShouldReturnForbidden()
+    public async Task GetAll_WithoutPermissions_ShouldReturnForbidden()
     {
-        // Arrange - no role set (default user)
+        // Arrange - no permissions set (default user)
 
         // Act
         var response = await Client.GetAsync("/api/v0.1/solution/tenants");
@@ -26,10 +27,10 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact(Skip = "TODO: Intermittent test failure due to data isolation issues in integration test pipeline. Test passes when run individually.")]
-    public async Task GetAll_WithSuperAdminRole_ShouldReturnTenants()
+    public async Task GetAll_WithPermissions_ShouldReturnTenants()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Read);
 
         var tenant1 = new Tenant { Name = "Test Tenant 1", Slug = "test-tenant-1", DatabaseName = "TestDb1", IsActive = true };
         var tenant2 = new Tenant { Name = "Test Tenant 2", Slug = "test-tenant-2", DatabaseName = "TestDb2", IsActive = false };
@@ -55,10 +56,10 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact(Skip = "TODO: Intermittent test failure due to data isolation issues in integration test pipeline. Test passes when run individually.")]
-    public async Task GetById_WithSuperAdminRole_ExistingTenant_ShouldReturnTenant()
+    public async Task GetById_WithPermissions_ExistingTenant_ShouldReturnTenant()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Read);
 
         var tenant = new Tenant { Name = "Test Tenant", Slug = "test-tenant", DatabaseName = "TestDb", IsActive = true, Metadata = new Dictionary<string, string> { ["Key"] = "Value" } };
 
@@ -84,10 +85,10 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact]
-    public async Task GetById_WithSuperAdminRole_NonExistingTenant_ShouldReturnNotFound()
+    public async Task GetById_WithPermissions_NonExistingTenant_ShouldReturnNotFound()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Read);
         var nonExistingId = Guid.NewGuid();
 
         // Act
@@ -98,10 +99,10 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact]
-    public async Task Create_WithSuperAdminRole_ValidRequest_ShouldCreateTenant()
+    public async Task Create_WithPermissions_ValidRequest_ShouldCreateTenant()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Create);
 
         var createRequest = new CreateTenantRequestDto(
             "New Tenant",
@@ -135,9 +136,9 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact]
-    public async Task Create_WithoutSuperAdminRole_ShouldReturnForbidden()
+    public async Task Create_WithoutPermissions_ShouldReturnForbidden()
     {
-        // Arrange - no role set
+        // Arrange - no permissions set
         var createRequest = new CreateTenantRequestDto(
             "New Tenant",
             "new-tenant",
@@ -159,7 +160,7 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     public async Task Create_WithInvalidRequest_ShouldReturnBadRequest()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Create);
 
         var createRequest = new CreateTenantRequestDto(
             "", // Invalid - empty name
@@ -179,10 +180,10 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact(Skip = "TODO: Intermittent test failure due to data isolation issues in integration test pipeline. Test passes when run individually.")]
-    public async Task Update_WithSuperAdminRole_ValidRequest_ShouldUpdateTenant()
+    public async Task Update_WithPermissions_ValidRequest_ShouldUpdateTenant()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Update);
 
         var tenant = new Tenant { Name = "Original Name", Slug = "original-slug", DatabaseName = "OriginalDb", IsActive = true };
 
@@ -220,7 +221,7 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     public async Task Update_NonExistingTenant_ShouldReturnNotFound()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Update);
         var nonExistingId = Guid.NewGuid();
 
         var updateRequest = new UpdateTenantRequestDto(
@@ -241,10 +242,10 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact(Skip = "TODO: Intermittent test failure due to data isolation issues in integration test pipeline. Test passes when run individually.")]
-    public async Task Delete_WithSuperAdminRole_ExistingTenant_ShouldDeleteTenant()
+    public async Task Delete_WithPermissions_ExistingTenant_ShouldDeleteTenant()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Delete);
 
         var tenant = new Tenant { Name = "Test Tenant", Slug = "test-tenant", DatabaseName = "TestDb", IsActive = true };
 
@@ -270,7 +271,7 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     public async Task Delete_NonExistingTenant_ShouldReturnNotFound()
     {
         // Arrange
-        SetTestUserRole("superadmin");
+        SetTestUserPermissions(Permissions.Tenants.Delete);
         var nonExistingId = Guid.NewGuid();
 
         // Act
@@ -281,9 +282,9 @@ public class TenantsControllerTests(IntegrationTestWebApplicationFactory<Program
     }
 
     [Fact]
-    public async Task Delete_WithoutSuperAdminRole_ShouldReturnForbidden()
+    public async Task Delete_WithoutPermissions_ShouldReturnForbidden()
     {
-        // Arrange - no role set
+        // Arrange - no permissions set
         var tenantId = Guid.NewGuid();
 
         // Act

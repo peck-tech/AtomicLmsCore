@@ -34,6 +34,8 @@ public static class InfrastructureExtensions
         services.Configure<Auth0Options>(configuration.GetSection(Auth0Options.SectionName));
         services.AddScoped<IIdentityTokenService, Auth0TokenService>();
         services.AddScoped<IIdentityManagementService, Auth0ManagementService>();
+        services.AddScoped<IUserContextService, UserContextService>();
+        services.AddScoped<IPermissionService, PermissionService>();
 
         return services;
     }

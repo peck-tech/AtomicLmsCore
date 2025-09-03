@@ -28,6 +28,12 @@ public abstract class IntegrationTestBase(IntegrationTestWebApplicationFactory<P
         Client.DefaultRequestHeaders.Add("X-Test-Role", role);
     }
 
+    protected void SetTestUserPermissions(params string[] permissions)
+    {
+        Client.DefaultRequestHeaders.Remove("X-Test-Permissions");
+        Client.DefaultRequestHeaders.Add("X-Test-Permissions", string.Join(",", permissions));
+    }
+
     protected void SetTestUserTenant(Guid tenantId)
     {
         Client.DefaultRequestHeaders.Remove("X-Test-Tenant");
