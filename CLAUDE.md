@@ -7,3 +7,4 @@
 - Code changes workflow: After editing any code/tests, run dotnet format && dotnet build && dotnet test. The task is not complete until all three commands pass without warnings or errors.
 - the current API version is 0.1
 - do not do any git commits unless explicitly told to
+- Spelling in en-gb

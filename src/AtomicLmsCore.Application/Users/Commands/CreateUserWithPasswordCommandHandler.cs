@@ -41,9 +41,12 @@ public class CreateUserWithPasswordCommandHandler(
             var identityUserResult = await identityManagementService.CreateUserAsync(request.Email, request.Password);
             if (identityUserResult.IsFailed)
             {
-                logger.LogWarning(
-                    "Failed to create user in identity provider: {Errors}",
-                    string.Join(", ", identityUserResult.Errors.Select(e => e.Message)));
+                if (logger.IsEnabled(LogLevel.Warning))
+                {
+                    logger.LogWarning(
+                        "Failed to create user in identity provider: {Errors}",
+                        string.Join(", ", identityUserResult.Errors.Select(e => e.Message)));
+                }
                 return Result.Fail<Guid>(identityUserResult.Errors);
             }
 
@@ -58,10 +61,13 @@ public class CreateUserWithPasswordCommandHandler(
                     var syncResult = await identityManagementService.UpdateUserMetadataAsync(identityUser.Id, metadataDict);
                     if (syncResult.IsFailed)
                     {
-                        logger.LogWarning(
-                            "Failed to sync metadata to identity provider for user {UserId}: {Errors}",
-                            identityUser.Id,
-                            string.Join(", ", syncResult.Errors.Select(e => e.Message)));
+                        if (logger.IsEnabled(LogLevel.Warning))
+                        {
+                            logger.LogWarning(
+                                "Failed to sync metadata to identity provider for user {UserId}: {Errors}",
+                                identityUser.Id,
+                                string.Join(", ", syncResult.Errors.Select(e => e.Message)));
+                        }
                     }
                 }
 

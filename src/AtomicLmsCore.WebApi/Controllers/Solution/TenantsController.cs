@@ -44,9 +44,12 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
                 return Ok(tenantDtos);
             }
 
-            logger.LogWarning(
-                "Failed to retrieve tenants: {Errors}",
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to retrieve tenants: {Errors}",
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
@@ -91,10 +94,13 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
                 return NotFound(notFoundResponse);
             }
 
-            logger.LogWarning(
-                "Failed to retrieve tenant {TenantId}: {Errors}",
-                id,
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to retrieve tenant {TenantId}: {Errors}",
+                    id,
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
@@ -143,9 +149,12 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
                     result.Value);
             }
 
-            logger.LogWarning(
-                "Failed to create tenant: {Errors}",
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to create tenant: {Errors}",
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.ValidationError(
                 result.Errors.Select(e => e.Message).ToList(),
@@ -199,10 +208,13 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
                 return NotFound(notFoundResponse);
             }
 
-            logger.LogWarning(
-                "Failed to update tenant {TenantId}: {Errors}",
-                id,
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to update tenant {TenantId}: {Errors}",
+                    id,
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.ValidationError(
                 result.Errors.Select(e => e.Message).ToList(),
@@ -248,10 +260,13 @@ public class TenantsController(IMediator mediator, ILogger<TenantsController> lo
                 return NotFound(notFoundResponse);
             }
 
-            logger.LogWarning(
-                "Failed to delete tenant {TenantId}: {Errors}",
-                id,
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to delete tenant {TenantId}: {Errors}",
+                    id,
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);

@@ -69,10 +69,13 @@ public class UpdateUserCommandHandler(
                 var syncResult = await identityManagementService.UpdateUserMetadataAsync(user.ExternalUserId, metadataDict);
                 if (syncResult.IsFailed)
                 {
-                    logger.LogWarning(
-                        "Failed to sync metadata to identity provider for user {ExternalUserId}: {Errors}",
-                        user.ExternalUserId,
-                        string.Join(", ", syncResult.Errors.Select(e => e.Message)));
+                    if (logger.IsEnabled(LogLevel.Warning))
+                    {
+                        logger.LogWarning(
+                            "Failed to sync metadata to identity provider for user {ExternalUserId}: {Errors}",
+                            user.ExternalUserId,
+                            string.Join(", ", syncResult.Errors.Select(e => e.Message)));
+                    }
                     // Don't fail the entire operation if metadata sync fails
                 }
                 else

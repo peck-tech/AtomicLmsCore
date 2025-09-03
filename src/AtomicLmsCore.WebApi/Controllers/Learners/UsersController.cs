@@ -43,9 +43,12 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
                 return Ok(userDtos);
             }
 
-            logger.LogWarning(
-                "Failed to retrieve users: {Errors}",
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to retrieve users: {Errors}",
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
@@ -76,23 +79,26 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
             var query = new GetUserByIdQuery(id);
             var result = await mediator.Send(query);
 
-            if (result.IsSuccess && result.Value != null)
+            if (result is { IsSuccess: true, Value: not null })
             {
                 var userDto = mapper.Map<UserDto>(result.Value);
                 return Ok(userDto);
             }
 
-            if (result.IsSuccess && result.Value == null)
+            if (result is { IsSuccess: true, Value: null })
             {
                 var notFoundResponse =
                     ErrorResponseDto.NotFoundError("User", HttpContext.Items["CorrelationId"]?.ToString());
                 return NotFound(notFoundResponse);
             }
 
-            logger.LogWarning(
-                "Failed to retrieve user {UserId}: {Errors}",
-                id,
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to retrieve user {UserId}: {Errors}",
+                    id,
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
@@ -141,9 +147,12 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
                     result.Value);
             }
 
-            logger.LogWarning(
-                "Failed to create user: {Errors}",
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to create user: {Errors}",
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.ValidationError(
                 result.Errors.Select(e => e.Message).ToList(),
@@ -194,9 +203,12 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
                     result.Value);
             }
 
-            logger.LogWarning(
-                "Failed to create user with password: {Errors}",
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to create user with password: {Errors}",
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.ValidationError(
                 result.Errors.Select(e => e.Message).ToList(),
@@ -250,10 +262,13 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
                 return NotFound(notFoundResponse);
             }
 
-            logger.LogWarning(
-                "Failed to update user {UserId}: {Errors}",
-                id,
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to update user {UserId}: {Errors}",
+                    id,
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.ValidationError(
                 result.Errors.Select(e => e.Message).ToList(),
@@ -288,10 +303,13 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
             if (!await permissionService.HasPermissionAsync(Permissions.Users.Delete))
             {
                 var validationResult = await permissionService.ValidatePermissionAsync(Permissions.Users.Delete);
-                logger.LogWarning(
-                    "Access denied to Delete user {UserId}: {Errors}",
-                    id,
-                    string.Join(", ", validationResult.Errors.Select(e => e.Message)));
+                if (logger.IsEnabled(LogLevel.Warning))
+                {
+                    logger.LogWarning(
+                        "Access denied to Delete user {UserId}: {Errors}",
+                        id,
+                        string.Join(", ", validationResult.Errors.Select(e => e.Message)));
+                }
 
                 var forbiddenResponse = ErrorResponseDto.ForbiddenError(
                     "Insufficient permissions to delete user",
@@ -314,10 +332,13 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
                 return NotFound(notFoundResponse);
             }
 
-            logger.LogWarning(
-                "Failed to delete user {UserId}: {Errors}",
-                id,
-                string.Join(", ", result.Errors.Select(e => e.Message)));
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(
+                    "Failed to delete user {UserId}: {Errors}",
+                    id,
+                    string.Join(", ", result.Errors.Select(e => e.Message)));
+            }
 
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);

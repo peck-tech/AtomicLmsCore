@@ -21,19 +21,28 @@ public class TelemetryBehavior<TRequest, TResponse>(
         var requestName = typeof(TRequest).Name;
         var stopwatch = Stopwatch.StartNew();
 
-        telemetryClient.TrackEvent(
-            $"{requestName}.Started",
-            new Dictionary<string, string>
-            {
+        // Only perform telemetry operations if telemetry is enabled
+        var telemetryEnabled = telemetryClient.IsEnabled();
+        if (telemetryEnabled)
+        {
+            telemetryClient.TrackEvent(
+                $"{requestName}.Started",
+                new Dictionary<string, string>
                 {
-                    "RequestType", typeof(TRequest).FullName ?? requestName
-                },
-                {
-                    "ResponseType", typeof(TResponse).FullName ?? typeof(TResponse).Name
-                },
-            });
+                    {
+                        "RequestType", typeof(TRequest).FullName ?? requestName
+                    },
+                    {
+                        "ResponseType", typeof(TResponse).FullName ?? typeof(TResponse).Name
+                    },
+                });
+        }
 
-        logger.LogInformation("Processing {RequestName}", requestName);
+        // Only log if Information level logging is enabled
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Processing {RequestName}", requestName);
+        }
 
         try
         {
@@ -41,24 +50,30 @@ public class TelemetryBehavior<TRequest, TResponse>(
 
             stopwatch.Stop();
 
-            telemetryClient.TrackEvent(
-                $"{requestName}.Completed",
-                new Dictionary<string, string>
-                {
+            if (telemetryEnabled)
+            {
+                telemetryClient.TrackEvent(
+                    $"{requestName}.Completed",
+                    new Dictionary<string, string>
                     {
-                        "Success", "true"
-                    },
-                    {
-                        "Duration", stopwatch.ElapsedMilliseconds.ToString()
-                    },
-                });
+                        {
+                            "Success", "true"
+                        },
+                        {
+                            "Duration", stopwatch.ElapsedMilliseconds.ToString()
+                        },
+                    });
 
-            telemetryClient.TrackMetric($"{requestName}.Duration", stopwatch.ElapsedMilliseconds);
+                telemetryClient.TrackMetric($"{requestName}.Duration", stopwatch.ElapsedMilliseconds);
+            }
 
-            logger.LogInformation(
-                "Completed {RequestName} in {ElapsedMilliseconds}ms",
-                requestName,
-                stopwatch.ElapsedMilliseconds);
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(
+                    "Completed {RequestName} in {ElapsedMilliseconds}ms",
+                    requestName,
+                    stopwatch.ElapsedMilliseconds);
+            }
 
             return response;
         }
@@ -66,30 +81,34 @@ public class TelemetryBehavior<TRequest, TResponse>(
         {
             stopwatch.Stop();
 
-            telemetryClient.TrackException(
-                ex,
-                new Dictionary<string, string>
-                {
+            if (telemetryEnabled)
+            {
+                telemetryClient.TrackException(
+                    ex,
+                    new Dictionary<string, string>
                     {
-                        "RequestType", requestName
-                    },
-                    {
-                        "Duration", stopwatch.ElapsedMilliseconds.ToString()
-                    },
-                });
+                        {
+                            "RequestType", requestName
+                        },
+                        {
+                            "Duration", stopwatch.ElapsedMilliseconds.ToString()
+                        },
+                    });
 
-            telemetryClient.TrackEvent(
-                $"{requestName}.Failed",
-                new Dictionary<string, string>
-                {
+                telemetryClient.TrackEvent(
+                    $"{requestName}.Failed",
+                    new Dictionary<string, string>
                     {
-                        "Duration", stopwatch.ElapsedMilliseconds.ToString()
-                    },
-                    {
-                        "ExceptionType", ex.GetType().Name
-                    },
-                });
+                        {
+                            "Duration", stopwatch.ElapsedMilliseconds.ToString()
+                        },
+                        {
+                            "ExceptionType", ex.GetType().Name
+                        },
+                    });
+            }
 
+            // Always log errors regardless of level (Error level should typically be enabled)
             logger.LogError(
                 ex,
                 "Error processing {RequestName} after {ElapsedMilliseconds}ms",
