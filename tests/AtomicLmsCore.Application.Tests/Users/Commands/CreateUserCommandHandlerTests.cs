@@ -18,11 +18,13 @@ public class CreateUserCommandHandlerTests
     public CreateUserCommandHandlerTests()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
+        var identityManagementServiceMock = new Mock<IIdentityManagementService>();
         _idGeneratorMock = new Mock<IIdGenerator>();
         var loggerMock = new Mock<ILogger<CreateUserCommandHandler>>();
 
         _handler = new CreateUserCommandHandler(
             _userRepositoryMock.Object,
+            identityManagementServiceMock.Object,
             _idGeneratorMock.Object,
             loggerMock.Object);
     }

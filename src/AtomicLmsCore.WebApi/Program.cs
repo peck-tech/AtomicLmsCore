@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddInfrastructureServices()
+    .AddIdentityProviderServices(builder.Configuration)
     .AddApiConfiguration()
     .AddSwaggerConfiguration()
     .AddPersistence()

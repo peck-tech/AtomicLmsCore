@@ -1,11 +1,10 @@
 using AtomicLmsCore.Application.Common.Interfaces;
-using AtomicLmsCore.Infrastructure.Persistence;
 using FluentResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace AtomicLmsCore.Infrastructure.Services;
+namespace AtomicLmsCore.Infrastructure.Persistence.Services;
 
 /// <summary>
 ///     SQL Server implementation of database operations for tenant database management.

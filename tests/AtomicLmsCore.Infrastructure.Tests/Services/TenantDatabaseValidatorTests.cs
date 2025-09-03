@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using AtomicLmsCore.Application.Common.Interfaces;
-using AtomicLmsCore.Infrastructure.Services;
+using AtomicLmsCore.Infrastructure.Persistence.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +12,6 @@ namespace AtomicLmsCore.Infrastructure.Tests.Services;
 
 public class TenantDatabaseValidatorTests : IDisposable
 {
-    private readonly Mock<IConnectionStringProvider> _connectionStringProviderMock;
-    private readonly Mock<IConfiguration> _configurationMock;
     private readonly IMemoryCache _memoryCache;
     private readonly Mock<ILogger<TenantDatabaseValidator>> _loggerMock;
     private readonly TenantDatabaseValidator _validator;
@@ -21,31 +19,29 @@ public class TenantDatabaseValidatorTests : IDisposable
 
     public TenantDatabaseValidatorTests()
     {
-        _connectionStringProviderMock = new Mock<IConnectionStringProvider>();
-        _configurationMock = new Mock<IConfiguration>();
+        var connectionStringProviderMock = new Mock<IConnectionStringProvider>();
+        var configurationMock = new Mock<IConfiguration>();
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
         _loggerMock = new Mock<ILogger<TenantDatabaseValidator>>();
 
         // Setup configuration
-        _configurationMock.Setup(x => x["TenantValidation:Secret"])
+        configurationMock.Setup(x => x["TenantValidation:Secret"])
             .Returns(TestSecret);
 
         // Setup connection string provider to return invalid connection to trigger test scenarios
-        _connectionStringProviderMock
+        connectionStringProviderMock
             .Setup(x => x.GetTenantConnectionString(It.IsAny<string>()))
             .Returns("Server=nonexistent;Database=test;Connection Timeout=1;");
 
         _validator = new TenantDatabaseValidator(
-            _connectionStringProviderMock.Object,
-            _configurationMock.Object,
+            connectionStringProviderMock.Object,
+            configurationMock.Object,
             _memoryCache,
             _loggerMock.Object);
     }
 
     public void Dispose()
-    {
-        _memoryCache.Dispose();
-    }
+        => _memoryCache.Dispose();
 
     public class CacheTests : TenantDatabaseValidatorTests
     {

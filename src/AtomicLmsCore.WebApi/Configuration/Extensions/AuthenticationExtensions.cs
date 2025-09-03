@@ -38,12 +38,41 @@ public static class AuthenticationExtensions
                             }
 
                             var customTenantClaims = claimsIdentity.Claims
-                                .Where(c => c.Type.Contains("tenant_id", StringComparison.OrdinalIgnoreCase) || c.Type.EndsWith("/tenant_id", StringComparison.OrdinalIgnoreCase))
+                                .Where(c => c.Type.Contains("tenant_id", StringComparison.OrdinalIgnoreCase) ||
+                                            c.Type.EndsWith("/tenant_id", StringComparison.OrdinalIgnoreCase) ||
+                                            c.Type == $"{jwtOptions.Audience}/tenant_id")
                                 .ToList();
 
                             foreach (var claim in customTenantClaims.Where(claim => claim.Type != "tenant_id"))
                             {
                                 claimsIdentity.AddClaim(new Claim("tenant_id", claim.Value));
+                            }
+
+                            var customRoleClaims = claimsIdentity.Claims
+                                .Where(c => c.Type.Contains("roles", StringComparison.OrdinalIgnoreCase) ||
+                                            c.Type.EndsWith("/roles", StringComparison.OrdinalIgnoreCase) ||
+                                            c.Type == $"{jwtOptions.Audience}/roles")
+                                .ToList();
+
+                            foreach (var claim in customRoleClaims.Where(claim => claim.Type != ClaimTypes.Role))
+                            {
+                                if (claim.Value.StartsWith('[') && claim.Value.EndsWith(']'))
+                                {
+                                    var roles = System.Text.Json.JsonSerializer.Deserialize<string[]>(claim.Value);
+                                    if (roles == null)
+                                    {
+                                        continue;
+                                    }
+
+                                    foreach (var role in roles)
+                                    {
+                                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+                                    }
+                                }
+                                else
+                                {
+                                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, claim.Value));
+                                }
                             }
                             return Task.CompletedTask;
                         },

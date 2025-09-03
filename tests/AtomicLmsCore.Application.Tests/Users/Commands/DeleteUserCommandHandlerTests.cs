@@ -10,12 +10,14 @@ namespace AtomicLmsCore.Application.Tests.Users.Commands;
 public class DeleteUserCommandHandlerTests
 {
     private readonly Mock<IUserRepository> _mockRepository;
+    private readonly Mock<IIdentityManagementService> _mockIdentityManagementService;
     private readonly Mock<ILogger<DeleteUserCommandHandler>> _mockLogger;
     private readonly DeleteUserCommandHandler _handler;
 
     public DeleteUserCommandHandlerTests()
     {
         _mockRepository = new Mock<IUserRepository>();
+        _mockIdentityManagementService = new Mock<IIdentityManagementService>();
         _mockLogger = new Mock<ILogger<DeleteUserCommandHandler>>();
         _handler = new DeleteUserCommandHandler(_mockRepository.Object, _mockLogger.Object);
     }
@@ -26,6 +28,12 @@ public class DeleteUserCommandHandlerTests
         // Arrange
         var id = Guid.NewGuid();
         var command = new DeleteUserCommand(id);
+
+        _mockRepository.Setup(x => x.GetByIdAsync(id))
+            .ReturnsAsync(Result.Ok((Domain.Entities.User?)null));
+
+        _mockRepository.Setup(x => x.GetByIdAsync(id))
+            .ReturnsAsync(Result.Ok((Domain.Entities.User?)null));
 
         _mockRepository.Setup(x => x.DeleteAsync(id))
             .ReturnsAsync(Result.Ok());
@@ -45,10 +53,13 @@ public class DeleteUserCommandHandlerTests
         // Arrange
         var id = Guid.NewGuid();
         var command = new DeleteUserCommand(id);
-        var repositoryError = "User not found";
+        const string RepositoryError = "User not found";
+
+        _mockRepository.Setup(x => x.GetByIdAsync(id))
+            .ReturnsAsync(Result.Ok((Domain.Entities.User?)null));
 
         _mockRepository.Setup(x => x.DeleteAsync(id))
-            .ReturnsAsync(Result.Fail(repositoryError));
+            .ReturnsAsync(Result.Fail(RepositoryError));
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -56,7 +67,7 @@ public class DeleteUserCommandHandlerTests
         // Assert
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().ContainSingle()
-            .Which.Message.Should().Be(repositoryError);
+            .Which.Message.Should().Be(RepositoryError);
         _mockRepository.Verify(x => x.DeleteAsync(id), Times.Once);
         VerifyLoggerWasNotCalled(LogLevel.Information);
     }
@@ -67,6 +78,9 @@ public class DeleteUserCommandHandlerTests
         // Arrange
         var id = Guid.NewGuid();
         var command = new DeleteUserCommand(id);
+
+        _mockRepository.Setup(x => x.GetByIdAsync(id))
+            .ReturnsAsync(Result.Ok((Domain.Entities.User?)null));
 
         _mockRepository.Setup(x => x.DeleteAsync(id))
             .ThrowsAsync(new Exception("Database error"));
@@ -94,6 +108,9 @@ public class DeleteUserCommandHandlerTests
             new Error("Error 2")
         };
 
+        _mockRepository.Setup(x => x.GetByIdAsync(id))
+            .ReturnsAsync(Result.Ok<Domain.Entities.User?>(null));
+
         _mockRepository.Setup(x => x.DeleteAsync(id))
             .ReturnsAsync(Result.Fail(errors));
 
@@ -115,6 +132,9 @@ public class DeleteUserCommandHandlerTests
         var command = new DeleteUserCommand(id);
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
+
+        _mockRepository.Setup(x => x.GetByIdAsync(id))
+            .ReturnsAsync(Result.Ok((Domain.Entities.User?)null));
 
         _mockRepository.Setup(x => x.DeleteAsync(id))
             .ReturnsAsync(Result.Ok());

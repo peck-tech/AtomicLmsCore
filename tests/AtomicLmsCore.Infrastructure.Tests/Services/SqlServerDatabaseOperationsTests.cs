@@ -1,4 +1,4 @@
-using AtomicLmsCore.Infrastructure.Services;
+using AtomicLmsCore.Infrastructure.Persistence.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -272,8 +272,7 @@ public class SqlServerDatabaseOperationsTests
     }
 
     private void VerifyLoggerWasCalled(LogLevel level, string message)
-    {
-        _mockLogger.Verify(
+        => _mockLogger.Verify(
             x => x.Log(
                 level,
                 It.IsAny<EventId>(),
@@ -281,5 +280,4 @@ public class SqlServerDatabaseOperationsTests
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.AtLeastOnce);
-    }
 }

@@ -10,12 +10,12 @@ public class JwtOptions
     /// <summary>
     ///     Gets or sets the Auth0 domain (authority).
     /// </summary>
-    required public string Authority { get; set; }
+    public required string Authority { get; set; }
 
     /// <summary>
     ///     Gets or sets the audience identifier for the API.
     /// </summary>
-    required public string Audience { get; set; }
+    public required string Audience { get; set; }
 
     /// <summary>
     ///     Gets or sets whether HTTPS is required for metadata address (default: true).

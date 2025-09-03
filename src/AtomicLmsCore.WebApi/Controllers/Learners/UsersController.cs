@@ -100,7 +100,7 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
     }
 
     /// <summary>
-    ///     Creates a new user in the tenant database.
+    ///     Creates a new user in the tenant database (requires existing Auth0 user).
     /// </summary>
     /// <param name="request">The user creation request.</param>
     /// <returns>The created user's ID.</returns>
@@ -146,6 +146,58 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
         catch (Exception ex)
         {
             logger.LogError(ex, "Error creating user");
+            var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+        }
+    }
+
+    /// <summary>
+    ///     Creates a new user with password in both Auth0 and the tenant database.
+    /// </summary>
+    /// <param name="request">The user creation request with password.</param>
+    /// <returns>The created user's ID.</returns>
+    [HttpPost("with-password")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateWithPassword([FromBody] CreateUserWithPasswordRequestDto request)
+    {
+        try
+        {
+            var command = new CreateUserWithPasswordCommand(
+                request.Email,
+                request.Password,
+                request.FirstName,
+                request.LastName,
+                request.DisplayName,
+                request.IsActive,
+                request.Metadata);
+
+            var result = await mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new
+                    {
+                        id = result.Value,
+                    },
+                    result.Value);
+            }
+
+            logger.LogWarning(
+                "Failed to create user with password: {Errors}",
+                string.Join(", ", result.Errors.Select(e => e.Message)));
+
+            var errorResponse = ErrorResponseDto.ValidationError(
+                result.Errors.Select(e => e.Message).ToList(),
+                HttpContext.Items["CorrelationId"]?.ToString());
+            return BadRequest(errorResponse);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error creating user with password");
             var errorResponse = ErrorResponseDto.SystemError(HttpContext.Items["CorrelationId"]?.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
         }

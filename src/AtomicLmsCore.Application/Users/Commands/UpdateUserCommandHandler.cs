@@ -12,6 +12,7 @@ namespace AtomicLmsCore.Application.Users.Commands;
 [UsedImplicitly]
 public class UpdateUserCommandHandler(
     IUserRepository userRepository,
+    IIdentityManagementService identityManagementService,
     ILogger<UpdateUserCommandHandler> logger)
     : IRequestHandler<UpdateUserCommand, Result>
 {
@@ -61,7 +62,29 @@ public class UpdateUserCommandHandler(
                 return Result.Fail(updateResult.Errors);
             }
 
-            logger.LogInformation("User updated successfully with ID {UserId}", user.Id);
+            // Sync user metadata to Auth0 if metadata is provided
+            if (request.Metadata != null && request.Metadata.Any())
+            {
+                var metadataDict = request.Metadata.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                var syncResult = await identityManagementService.UpdateUserMetadataAsync(user.ExternalUserId, metadataDict);
+                if (syncResult.IsFailed)
+                {
+                    logger.LogWarning(
+                        "Failed to sync metadata to identity provider for user {ExternalUserId}: {Errors}",
+                        user.ExternalUserId,
+                        string.Join(", ", syncResult.Errors.Select(e => e.Message)));
+                    // Don't fail the entire operation if metadata sync fails
+                }
+                else
+                {
+                    logger.LogDebug("Successfully synced metadata to identity provider for user {ExternalUserId}", user.ExternalUserId);
+                }
+            }
+
+            logger.LogInformation(
+                "User updated successfully with ID {UserId} and external ID {ExternalUserId}",
+                user.Id,
+                user.ExternalUserId);
             return Result.Ok();
         }
         catch (Exception ex)

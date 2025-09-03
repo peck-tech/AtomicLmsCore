@@ -2,7 +2,7 @@ using AtomicLmsCore.Application.Common.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-namespace AtomicLmsCore.Infrastructure.Services;
+namespace AtomicLmsCore.Infrastructure.Persistence.Services;
 
 /// <summary>
 ///     Provides connection strings for the multi-database architecture.

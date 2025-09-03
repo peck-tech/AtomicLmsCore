@@ -1,4 +1,4 @@
-using AtomicLmsCore.Infrastructure.Services;
+using AtomicLmsCore.Infrastructure.Persistence.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;

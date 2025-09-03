@@ -14,6 +14,7 @@ namespace AtomicLmsCore.Application.Users.Commands;
 [UsedImplicitly]
 public class CreateUserCommandHandler(
     IUserRepository userRepository,
+    IIdentityManagementService identityManagementService,
     IIdGenerator idGenerator,
     ILogger<CreateUserCommandHandler> logger)
     : IRequestHandler<CreateUserCommand, Result<Guid>>
@@ -62,7 +63,29 @@ public class CreateUserCommandHandler(
                 return Result.Fail<Guid>(addResult.Errors);
             }
 
-            logger.LogInformation("User created successfully with ID {UserId}", user.Id);
+            // Sync user metadata to Auth0 if metadata is provided
+            if (request.Metadata != null && request.Metadata.Any())
+            {
+                var metadataDict = request.Metadata.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                var syncResult = await identityManagementService.UpdateUserMetadataAsync(request.ExternalUserId, metadataDict);
+                if (syncResult.IsFailed)
+                {
+                    logger.LogWarning(
+                        "Failed to sync metadata to identity provider for user {ExternalUserId}: {Errors}",
+                        request.ExternalUserId,
+                        string.Join(", ", syncResult.Errors.Select(e => e.Message)));
+                    // Don't fail the entire operation if metadata sync fails
+                }
+                else
+                {
+                    logger.LogDebug("Successfully synced metadata to identity provider for user {ExternalUserId}", request.ExternalUserId);
+                }
+            }
+
+            logger.LogInformation(
+                "User created successfully with ID {UserId} and external ID {ExternalUserId}",
+                user.Id,
+                request.ExternalUserId);
             return Result.Ok(user.Id);
         }
         catch (Exception ex)

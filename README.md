@@ -44,25 +44,41 @@ Clean Architecture with the following projects:
    }
    ```
 
-2. **JWT Configuration**: Configure Auth0 settings in `appsettings.json`:
+2. **JWT & Auth0 Configuration**: Configure authentication settings in `appsettings.json`:
    ```json
    {
      "Jwt": {
        "Authority": "https://your-auth0-domain.auth0.com/",
        "Audience": "https://your-api-audience"
+     },
+     "Auth0": {
+       "Domain": "your-auth0-domain.auth0.com",
+       "ClientId": "your-client-id",
+       "ClientSecret": "REPLACE_WITH_USER_SECRET_OR_ENVIRONMENT_VARIABLE",
+       "ManagementApiAudience": "https://your-auth0-domain.auth0.com/api/v2/"
      }
    }
    ```
 
-3. **Tenant Validation Secret**: Add to user secrets or appsettings:
+3. **Secure Secrets Configuration**: Initialize user secrets and add sensitive values:
    ```bash
+   # Navigate to the WebApi project
+   cd src/AtomicLmsCore.WebApi
+   
+   # Initialize user secrets (only needed once)
+   dotnet user-secrets init
+   
+   # Add Auth0 Client Secret
+   dotnet user-secrets set "Auth0:ClientSecret" "your-actual-client-secret"
+   
+   # Add Health Check Secret
+   dotnet user-secrets set "HealthCheck:Secret" "your-health-check-secret-key"
+   
+   # Add Tenant Validation Secret (if using)
    dotnet user-secrets set "TenantValidation:Secret" "your-secure-secret-key"
    ```
 
-4. **Health Check Configuration**: Configure health check authentication:
-   ```bash
-   dotnet user-secrets set "HealthCheck:Secret" "your-health-check-secret-key"
-   ```
+   **Note**: Never commit actual secrets to source control. The `appsettings.json` file should contain placeholder values, while actual secrets should be stored in user secrets for development or environment variables for production.
 
 ### Running the Application
 

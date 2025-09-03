@@ -72,6 +72,14 @@ public class IntegrationTestWebApplicationFactory<TProgram> : WebApplicationFact
             }
             services.AddScoped<ITenantAccessor, TestTenantAccessor>();
 
+            // Replace IIdentityManagementService with test implementation
+            var identityServiceDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IIdentityManagementService));
+            if (identityServiceDescriptor != null)
+            {
+                services.Remove(identityServiceDescriptor);
+            }
+            services.AddScoped<IIdentityManagementService, TestIdentityManagementService>();
+
             // Replace authentication with test authentication
             services.AddAuthentication("Test")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>(

@@ -2,14 +2,13 @@ using System.Security.Cryptography;
 using System.Text;
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Domain.Entities;
-using AtomicLmsCore.Infrastructure.Persistence;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace AtomicLmsCore.Infrastructure.Services;
+namespace AtomicLmsCore.Infrastructure.Persistence.Services;
 
 /// <summary>
 ///     Service for validating that tenant databases actually belong to the correct tenant.

@@ -11,14 +11,16 @@ namespace AtomicLmsCore.Application.Tests.Users.Commands;
 public class UpdateUserCommandHandlerTests
 {
     private readonly Mock<IUserRepository> _mockRepository;
+    private readonly Mock<IIdentityManagementService> _mockIdentityManagementService;
     private readonly Mock<ILogger<UpdateUserCommandHandler>> _mockLogger;
     private readonly UpdateUserCommandHandler _handler;
 
     public UpdateUserCommandHandlerTests()
     {
         _mockRepository = new Mock<IUserRepository>();
+        _mockIdentityManagementService = new Mock<IIdentityManagementService>();
         _mockLogger = new Mock<ILogger<UpdateUserCommandHandler>>();
-        _handler = new UpdateUserCommandHandler(_mockRepository.Object, _mockLogger.Object);
+        _handler = new UpdateUserCommandHandler(_mockRepository.Object, _mockIdentityManagementService.Object, _mockLogger.Object);
     }
 
     [Fact]
@@ -50,6 +52,8 @@ public class UpdateUserCommandHandlerTests
         _mockRepository.Setup(x => x.EmailExistsAsync("new@example.com", id))
             .ReturnsAsync(Result.Ok(false));
         _mockRepository.Setup(x => x.UpdateAsync(It.IsAny<User>()))
+            .ReturnsAsync(Result.Ok());
+        _mockIdentityManagementService.Setup(x => x.UpdateUserMetadataAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, object>>()))
             .ReturnsAsync(Result.Ok());
 
         // Act
