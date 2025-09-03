@@ -1,5 +1,6 @@
 using AtomicLmsCore.Application.Common.Interfaces;
 using AtomicLmsCore.Infrastructure.Persistence;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AtomicLmsCore.IntegrationTests.Common;
 
+[UsedImplicitly]
 public class IntegrationTestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -43,26 +45,17 @@ public class IntegrationTestWebApplicationFactory<TProgram> : WebApplicationFact
             }
 
             // Register in-memory database contexts for testing
-            services.AddScoped(_ =>
-            {
-                var options = new DbContextOptionsBuilder<SolutionsDbContext>()
-                    .UseInMemoryDatabase("TestSolutionsDb")
-                    .Options;
-                var dbContext = new SolutionsDbContext(options);
-                dbContext.Database.EnsureCreated();
-                return dbContext;
-            });
+            // Use unique database names to avoid conflicts between tests
+            var testId = Guid.NewGuid().ToString();
+            services.AddSingleton(_ => new DbContextOptionsBuilder<SolutionsDbContext>()
+                .UseInMemoryDatabase($"TestSolutionsDb_{testId}")
+                .Options);
+            services.AddScoped<SolutionsDbContext>();
 
-            services.AddScoped(serviceProvider =>
-            {
-                var idGenerator = serviceProvider.GetRequiredService<Domain.Services.IIdGenerator>();
-                var options = new DbContextOptionsBuilder<TenantDbContext>()
-                    .UseInMemoryDatabase("TestTenantDb")
-                    .Options;
-                var dbContext = new TenantDbContext(options, idGenerator);
-                dbContext.Database.EnsureCreated();
-                return dbContext;
-            });
+            services.AddSingleton(_ => new DbContextOptionsBuilder<TenantDbContext>()
+                .UseInMemoryDatabase($"TestTenantDb_{testId}")
+                .Options);
+            services.AddScoped<TenantDbContext>();
 
             // Replace ITenantAccessor with test implementation
             var tenantAccessorDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(ITenantAccessor));
@@ -88,5 +81,4 @@ public class IntegrationTestWebApplicationFactory<TProgram> : WebApplicationFact
 
         builder.UseEnvironment("Test");
     }
-
 }
