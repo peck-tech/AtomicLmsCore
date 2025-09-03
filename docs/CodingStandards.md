@@ -71,6 +71,9 @@
 ## Performance Standards
 - Batch database operations in background jobs
 
+## Logging and Telemetry Standards
+- Expensive logging or telemetry should have a check to see if the log level/telemetry is enabled
+
 ## Event-Driven Architecture
 - Events should be published for all user actions
 - Events should be published for all database write operations

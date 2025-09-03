@@ -10,14 +10,12 @@ namespace AtomicLmsCore.Application.Tests.Users.Commands;
 public class DeleteUserCommandHandlerTests
 {
     private readonly Mock<IUserRepository> _mockRepository;
-    private readonly Mock<IIdentityManagementService> _mockIdentityManagementService;
     private readonly Mock<ILogger<DeleteUserCommandHandler>> _mockLogger;
     private readonly DeleteUserCommandHandler _handler;
 
     public DeleteUserCommandHandlerTests()
     {
         _mockRepository = new Mock<IUserRepository>();
-        _mockIdentityManagementService = new Mock<IIdentityManagementService>();
         _mockLogger = new Mock<ILogger<DeleteUserCommandHandler>>();
         _handler = new DeleteUserCommandHandler(_mockRepository.Object, _mockLogger.Object);
     }
