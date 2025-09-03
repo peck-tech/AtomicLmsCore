@@ -155,12 +155,12 @@ public class PermissionService(
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<string>> GetPermissionsAsync()
+    public Task<IEnumerable<string>> GetPermissionsAsync()
     {
         var context = httpContextAccessor.HttpContext;
         if (context?.User.Identity?.IsAuthenticated != true)
         {
-            return [];
+            return Task.FromResult<IEnumerable<string>>([]);
         }
 
         var permissions = new HashSet<string>();
@@ -197,7 +197,7 @@ public class PermissionService(
             }
         }
 
-        return permissions;
+        return Task.FromResult<IEnumerable<string>>(permissions);
     }
 
     /// <inheritdoc />

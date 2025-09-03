@@ -1,0 +1,116 @@
+### AtomicLMS Tenants API Tests
+### Base URL and auth setup
+@baseUrl = https://localhost:7001
+@testRole = superadmin
+
+### Create a new tenant
+POST {{baseUrl}}/api/v0.1/solution/tenants
+Content-Type: application/json
+X-Test-Role: {{testRole}}
+
+{
+  "name": "Test Tenant",
+  "slug": "test-tenant",
+  "databaseName": "TestDatabase",
+  "isActive": true,
+  "metadata": {
+    "environment": "test",
+    "region": "us-west"
+  }
+}
+
+> {%
+  client.test("Status is 201", function() {
+    client.assert(response.status === 201, "Expected 201 but got " + response.status);
+  });
+  
+  client.test("Response contains tenant ID", function() {
+    const tenantId = response.body;
+    client.assert(typeof tenantId === 'string', "Expected string tenant ID");
+    client.global.set("createdTenantId", tenantId);
+  });
+%}
+
+### Get all tenants
+GET {{baseUrl}}/api/v0.1/solution/tenants
+X-Test-Role: {{testRole}}
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected 200 but got " + response.status);
+  });
+  
+  client.test("Returns array", function() {
+    client.assert(Array.isArray(response.body), "Expected array response");
+  });
+%}
+
+### Get tenant by ID
+GET {{baseUrl}}/api/v0.1/solution/tenants/{{createdTenantId}}
+X-Test-Role: {{testRole}}
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected 200 but got " + response.status);
+  });
+  
+  client.test("Tenant has correct structure", function() {
+    const tenant = response.body;
+    client.assert(tenant.id === client.global.get("createdTenantId"), "Tenant ID mismatch");
+    client.assert(tenant.name === "Test Tenant", "Name mismatch");
+  });
+%}
+
+### Update tenant
+PUT {{baseUrl}}/api/v0.1/solution/tenants/{{createdTenantId}}
+Content-Type: application/json
+X-Test-Role: {{testRole}}
+
+{
+  "name": "Updated Test Tenant",
+  "slug": "updated-test-tenant", 
+  "isActive": false,
+  "metadata": {
+    "updated": "true"
+  }
+}
+
+> {%
+  client.test("Status is 204", function() {
+    client.assert(response.status === 204, "Expected 204 but got " + response.status);
+  });
+%}
+
+### Delete tenant
+DELETE {{baseUrl}}/api/v0.1/solution/tenants/{{createdTenantId}}
+X-Test-Role: {{testRole}}
+
+> {%
+  client.test("Status is 204", function() {
+    client.assert(response.status === 204, "Expected 204 but got " + response.status);
+  });
+%}
+
+### Test validation - should fail
+POST {{baseUrl}}/api/v0.1/solution/tenants
+Content-Type: application/json
+X-Test-Role: {{testRole}}
+
+{
+  "name": "",
+  "slug": "test",
+  "databaseName": "db",
+  "isActive": true
+}
+
+> {%
+  client.test("Status is 400", function() {
+    client.assert(response.status === 400, "Expected 400 but got " + response.status);
+  });
+  
+  client.test("Error response structure", function() {
+    const error = response.body;
+    client.assert(error.code, "Missing error code");
+    client.assert(error.message, "Missing error message");
+  });
+%}

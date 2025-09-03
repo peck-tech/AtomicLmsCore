@@ -42,7 +42,7 @@ public class TenantAccessorTests
     public void GetCurrentTenantId_NoHttpContext_ReturnsNull()
     {
         // Arrange
-        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext?)null);
+        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(null as HttpContext);
 
         // Act
         var result = _tenantAccessor.GetCurrentTenantId();
@@ -161,7 +161,7 @@ public class TenantAccessorTests
     public void GetRequiredCurrentTenantId_NoHttpContext_ThrowsInvalidOperationException()
     {
         // Arrange
-        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns((HttpContext?)null);
+        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(null as HttpContext);
 
         // Act & Assert
         var action = () => _tenantAccessor.GetRequiredCurrentTenantId();

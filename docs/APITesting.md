@@ -1,6 +1,41 @@
-# API Testing with Postman
+# API Testing Guide
 
-## Using the Pre-Generated Collections
+AtomicLMS provides multiple approaches for testing the API, from manual exploration to automated CI/CD integration. Choose the approach that best fits your needs.
+
+## Test Harness Options (Prioritized)
+
+### 🥇 Postman Collections (Immediate - 5 minutes)
+**Best for:** Manual testing, exploring the API, team collaboration
+- Pre-built collections with test assertions
+- Authentication & authorization testing  
+- Multi-tenant context handling
+- Input validation scenarios
+- Request chaining (create → get → update → delete)
+
+### 🥈 HTTP Files (Quick - 15 minutes)
+**Best for:** Quick development testing, IDE integration
+- Native support in JetBrains Rider and VS Code
+- Simple syntax with JavaScript test assertions
+- Variables and environment support
+- Perfect for rapid iteration during development
+
+### 🥉 Console Test Client (Advanced - 30 minutes)
+**Best for:** Automated scenarios, custom test logic
+- Programmatic API interaction
+- Custom test scenarios
+- Integration with build pipelines
+- Educational reference implementation
+
+### 🏆 Newman CLI (Professional - CI/CD Integration)
+**Best for:** Automated testing, continuous integration
+- Command-line execution of Postman collections
+- HTML/JUnit reporting
+- Environment variable integration
+- Pipeline-friendly
+
+## Postman Collections
+
+### Using the Pre-Generated Collections
 
 The project includes Postman collections and environment files in the `/PostmanCollections` directory:
 - `AtomicLMS-Tenants-API.postman_collection.json` - Tenant management endpoints
@@ -69,7 +104,89 @@ When adding new API endpoints:
 3. Run the export process to regenerate collections
 4. Commit the updated JSON files
 
-## Using with Newman (CLI)
+## HTTP Files (IDE Integration)
+
+HTTP files provide a lightweight alternative to Postman with native IDE support.
+
+### Setup
+
+**JetBrains Rider:** Built-in support (no setup required)
+**VS Code:** Install the "REST Client" extension
+
+### Usage
+
+1. Open any `.http` file in the `api-tests/` directory (e.g., `api-tests/tenants.http`)
+2. Click "Run Request" link above any HTTP request
+3. View results in the editor
+4. Variables are shared between requests in the same file
+
+### Example
+
+```http
+### Create a tenant
+POST https://localhost:7001/api/v0.1/solution/tenants
+Content-Type: application/json
+X-Test-Role: superadmin
+
+{
+  "name": "Test Tenant",
+  "slug": "test-tenant", 
+  "databaseName": "TestDatabase",
+  "isActive": true
+}
+
+> {%
+  client.test("Status is 201", function() {
+    client.assert(response.status === 201);
+  });
+  
+  client.global.set("createdTenantId", response.body);
+%}
+
+### Get the created tenant
+GET https://localhost:7001/api/v0.1/solution/tenants/{{createdTenantId}}
+X-Test-Role: superadmin
+```
+
+### Benefits
+- ✅ No external tools required
+- ✅ Version controlled with your code
+- ✅ JavaScript test assertions
+- ✅ Variable support and chaining
+- ✅ Fast execution and iteration
+
+## Console Test Client
+
+A programmatic test client for automated scenarios and custom testing logic.
+
+### Quick Start
+
+```bash
+# Navigate to the test client
+cd tools/ApiTestClient
+
+# Run the test client
+dotnet run
+```
+
+### Usage
+
+The console client demonstrates:
+- HttpClient configuration for test scenarios
+- Authentication header setup
+- Full CRUD operations with assertions
+- Error handling and validation
+- Custom test logic implementation
+
+### Extending
+
+Modify `tools/ApiTestClient/Program.cs` to add:
+- New endpoint testing
+- Performance timing
+- Custom validation scenarios
+- Integration with external data sources
+
+## Newman CLI (CI/CD Integration)
 
 Newman allows running Postman collections from the command line, useful for CI/CD pipelines:
 
@@ -92,4 +209,31 @@ newman run PostmanCollections/AtomicLMS-Tenants-API.postman_collection.json \
   --environment PostmanCollections/AtomicLMS-Dev.postman_environment.json \
   --reporters cli,html \
   --reporter-html-export test-results.html
+```
+
+## Quick Reference
+
+### Generate Postman Collections
+```bash
+# Modify the test to remove Skip, then run:
+dotnet test --filter "GeneratePostmanCollections"
+# Import the generated JSON files into Postman
+```
+
+### Run HTTP File Tests
+```bash
+# Open any .http file in api-tests/ directory
+# Click "Run Request" in your IDE (Rider/VS Code)
+```
+
+### Run Console Test Client
+```bash
+cd tools/ApiTestClient
+dotnet run
+```
+
+### Run Newman CLI Tests
+```bash
+newman run PostmanCollections/AtomicLMS-Tenants-API.postman_collection.json \
+  --environment PostmanCollections/AtomicLMS-Dev.postman_environment.json
 ```
